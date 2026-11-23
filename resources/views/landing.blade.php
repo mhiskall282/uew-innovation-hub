@@ -10,36 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS (CDN fallback) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        uew: {
-                            navy: {
-                                deep: '#0a1b4d',
-                                DEFAULT: '#102a72',
-                                light: '#1e3a8a',
-                            },
-                            royal: '#3157d5',
-                            purple: '#6d28d9',
-                            gold: {
-                                DEFAULT: '#f59e0b',
-                                light: '#fbbf24',
-                                dark: '#d97706',
-                            }
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
-                    }
-                }
-            }
-        }
-    </script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         body { font-family: 'Inter', sans-serif; }
         .font-mono { font-family: 'JetBrains Mono', monospace; }

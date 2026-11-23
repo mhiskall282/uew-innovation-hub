@@ -10,6 +10,7 @@ use App\Models\GrantApplication;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class GrantApplicationController extends Controller
@@ -26,7 +27,7 @@ class GrantApplicationController extends Controller
         $data = $request->validated();
 
         if ($request->hasFile('proposal_file') && $request->file('proposal_file')->isValid()) {
-            $filename = 'grant_' . time() . '_' . $request->file('proposal_file')->getClientOriginalName();
+            $filename = 'grant_' . time() . '_' . Str::lower(Str::random(10)) . '.pdf';
             $request->file('proposal_file')->storeAs('reports', $filename, 'private');
             $data['proposal_file_path'] = $filename;
         }
@@ -35,7 +36,7 @@ class GrantApplicationController extends Controller
 
         // Dispatch Confirmation Notification to Applicant
         try {
-            Mail::to($application->email)->send(new GrantApplicationReceivedMail($application));
+            Mail::to($application->email)->queue(new GrantApplicationReceivedMail($application));
         } catch (\Throwable $e) {
             // Logged silently so application flow continues
         }
@@ -99,7 +100,7 @@ class GrantApplicationController extends Controller
 
         // Dispatch Status Determination Notification to Applicant
         try {
-            Mail::to($application->email)->send(new GrantStatusUpdatedMail($application));
+            Mail::to($application->email)->queue(new GrantStatusUpdatedMail($application));
         } catch (\Throwable $e) {
             // Logged silently
         }

@@ -9,10 +9,10 @@ class ReportExportService
 {
     public function exportCsv(array $filters): StreamedResponse
     {
-        $projects = Project::with('organizations')
+        $query = Project::with('organizations')
             ->filter($filters)
-            ->latest('start_date')
-            ->get();
+            ->orderByDesc('start_date')
+            ->orderByDesc('id');
 
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
@@ -22,7 +22,7 @@ class ReportExportService
             'Expires' => '0',
         ];
 
-        $callback = function () use ($projects) {
+        $callback = function () use ($query) {
             $handle = fopen('php://output', 'w');
             // Output UTF-8 BOM for Excel compatibility
             fputs($handle, "\xEF\xBB\xBF");
@@ -45,14 +45,17 @@ class ReportExportService
             $totalBeneficiaries = 0;
             $totalGrant = 0;
 
+            $count = 0;
+            $query->chunk(500, function ($projects) use ($handle, &$totalBeneficiaries, &$totalGrant, &$count) {
             foreach ($projects as $p) {
+                $count++;
                 $orgsList = $p->organizations->map(fn($o) => "{$o->name} ({$o->pivot->role})")->join('; ');
                 $totalBeneficiaries += $p->beneficiaries_reached;
                 $totalGrant += (float) $p->grant_amount;
 
                 fputcsv($handle, [
                     $p->id,
-                    $p->title,
+                    $this->safe($p->title),
                     $p->category,
                     strtoupper($p->status),
                     $p->start_date ? $p->start_date->format('d M Y') : 'N/A',
@@ -60,16 +63,17 @@ class ReportExportService
                     $p->beneficiaries_target,
                     $p->beneficiaries_reached,
                     number_format((float) $p->grant_amount, 2),
-                    $p->lead_researcher ?? 'N/A',
-                    $orgsList ?: 'None',
+                    $this->safe($p->lead_researcher ?? 'N/A'),
+                    $this->safe($orgsList ?: 'None'),
                     $p->report_file_path ? 'Yes' : 'No',
                 ]);
             }
+            });
 
             // Summary row
             fputcsv($handle, [
                 '',
-                'TOTAL (' . count($projects) . ' Projects)',
+                'TOTAL (' . $count . ' Projects)',
                 '',
                 '',
                 '',
@@ -86,5 +90,17 @@ class ReportExportService
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Neutralise spreadsheet formula injection (=, +, -, @) in user-supplied cells.
+     */
+    private function safe(?string $value): string
+    {
+        $value = (string) $value;
+
+        return $value !== '' && in_array($value[0], ['=', '+', '-', '@', "\t", "\r"], true)
+            ? "'" . $value
+            : $value;
     }
 }

@@ -67,7 +67,7 @@ class UserController extends Controller
 
         if ($passwordChanged) {
             try {
-                Mail::to($user->email)->send(new PasswordChangedMail($user));
+                Mail::to($user->email)->queue(new PasswordChangedMail($user));
             } catch (\Throwable $e) {}
         }
 

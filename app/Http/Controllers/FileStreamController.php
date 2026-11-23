@@ -21,6 +21,12 @@ class FileStreamController extends Controller
             abort(400, 'Invalid filename format.');
         }
 
+        // Applicant proposals contain personal data: reviewers and staff only.
+        if (str_starts_with($filename, 'grant_')) {
+            $user = $request->user();
+            abort_unless($user && $user->canReviewApplications(), 403, 'Proposal documents are restricted to the review committee.');
+        }
+
         $filePath = "{$type}/{$filename}";
 
         if (!Storage::disk('private')->exists($filePath)) {

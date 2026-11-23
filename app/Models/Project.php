@@ -75,6 +75,18 @@ class Project extends Model
         return $this->hasMany(Publication::class);
     }
 
+    /**
+     * Database-agnostic SQL expression extracting the year from start_date.
+     */
+    public static function yearExpression(): string
+    {
+        return match (static::query()->getConnection()->getDriverName()) {
+            'sqlite' => "CAST(strftime('%Y', start_date) AS INTEGER)",
+            'pgsql' => 'EXTRACT(YEAR FROM start_date)::int',
+            'sqlsrv' => 'YEAR(start_date)',
+            default => 'YEAR(start_date)',
+        };
+    }
     // Scopes
     public function scopeActive($query)
     {

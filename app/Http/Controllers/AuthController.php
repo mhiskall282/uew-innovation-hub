@@ -27,7 +27,7 @@ class AuthController extends Controller
 
             // Dispatch Login Alert Security Notification
             try {
-                Mail::to($request->user()->email)->send(new LoginAlertMail($request->user(), $request->ip()));
+                Mail::to($request->user()->email)->queue(new LoginAlertMail($request->user(), $request->ip()));
             } catch (\Throwable $e) {}
 
             return redirect()->intended(route('dashboard'))

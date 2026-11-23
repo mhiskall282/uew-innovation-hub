@@ -7,48 +7,55 @@ use App\Models\Organization;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
+use App\Support\HubStats;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
 class ProjectService
 {
     public function getDashboardMetrics(): array
     {
-        $totalProjects = Project::count();
-        $activeProjects = Project::where('status', 'active')->count();
-        $completedProjects = Project::where('status', 'completed')->count();
-        $totalBeneficiaries = (int) Project::sum('beneficiaries_reached');
-        $totalTargetBeneficiaries = (int) Project::sum('beneficiaries_target');
-        $totalFunding = (float) Project::sum('grant_amount');
-        $totalOrganizations = Organization::count();
+        return Cache::remember('hub.dashboard_metrics', HubStats::TTL, function () {
+            $totals = Project::query()
+                ->selectRaw('COUNT(*) as total')
+                ->selectRaw("SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active")
+                ->selectRaw("SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed")
+                ->selectRaw('COALESCE(SUM(beneficiaries_reached), 0) as reached')
+                ->selectRaw('COALESCE(SUM(beneficiaries_target), 0) as target')
+                ->selectRaw('COALESCE(SUM(grant_amount), 0) as funding')
+                ->toBase()
+                ->first();
 
-        // Projects by Category
-        $byCategory = Project::select('category', DB::raw('count(*) as count'))
-            ->groupBy('category')
-            ->pluck('count', 'category')
-            ->toArray();
+            $byCategory = Project::query()
+                ->select('category', DB::raw('COUNT(*) as aggregate'))
+                ->groupBy('category')
+                ->pluck('aggregate', 'category')
+                ->toArray();
 
-        // Projects by Year
-        $byYear = Project::select(DB::raw("strftime('%Y', start_date) as year"), DB::raw('count(*) as count'))
-            ->whereNotNull('start_date')
-            ->groupBy('year')
-            ->orderBy('year', 'desc')
-            ->pluck('count', 'year')
-            ->toArray();
+            $yearExpr = Project::yearExpression();
+            $byYear = Project::query()
+                ->select(DB::raw("{$yearExpr} as year"), DB::raw('COUNT(*) as aggregate'))
+                ->whereNotNull('start_date')
+                ->groupBy(DB::raw($yearExpr))
+                ->orderByDesc(DB::raw($yearExpr))
+                ->pluck('aggregate', 'year')
+                ->toArray();
 
-        return [
-            'total_projects' => $totalProjects,
-            'active_projects' => $activeProjects,
-            'completed_projects' => $completedProjects,
-            'total_beneficiaries' => $totalBeneficiaries,
-            'total_target_beneficiaries' => $totalTargetBeneficiaries,
-            'total_funding' => $totalFunding,
-            'total_organizations' => $totalOrganizations,
-            'by_category' => $byCategory,
-            'by_year' => $byYear,
-        ];
+            return [
+                'total_projects' => (int) $totals->total,
+                'active_projects' => (int) $totals->active,
+                'completed_projects' => (int) $totals->completed,
+                'total_beneficiaries' => (int) $totals->reached,
+                'total_target_beneficiaries' => (int) $totals->target,
+                'total_funding' => (float) $totals->funding,
+                'total_organizations' => Organization::count(),
+                'by_category' => $byCategory,
+                'by_year' => $byYear,
+            ];
+        });
     }
-
     public function getFilteredPaginatedProjects(array $filters, int $perPage = 15): LengthAwarePaginator
     {
         return Project::with(['organizations', 'creator'])
@@ -65,7 +72,7 @@ class ProjectService
             unset($data['organizations']);
 
             if (isset($data['report_file']) && $data['report_file']->isValid()) {
-                $filename = 'project_' . time() . '_' . $data['report_file']->getClientOriginalName();
+                $filename = 'project_' . time() . '_' . Str::lower(Str::random(8)) . '.pdf';
                 $data['report_file']->storeAs('reports', $filename, 'private');
                 $data['report_file_path'] = $filename;
                 unset($data['report_file']);
@@ -93,6 +100,8 @@ class ProjectService
                 'description' => "Registered new project: {$project->title}",
                 'ip_address' => request()->ip(),
             ]);
+
+            HubStats::flush();
 
             return $project;
         });
@@ -135,6 +144,8 @@ class ProjectService
                 'ip_address' => request()->ip(),
             ]);
 
+            HubStats::flush();
+
             return $project;
         });
     }
@@ -151,6 +162,8 @@ class ProjectService
                 'description' => "Soft-deleted project: {$title}",
                 'ip_address' => request()->ip(),
             ]);
+
+            HubStats::flush();
 
             return $deleted;
         });

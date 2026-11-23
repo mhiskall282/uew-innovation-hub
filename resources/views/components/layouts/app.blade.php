@@ -12,44 +12,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS (CDN fallback + Vite) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        uew: {
-                            navy: {
-                                deep: '#0a1b4d',
-                                DEFAULT: '#102a72',
-                                light: '#1e3a8a',
-                            },
-                            royal: '#3157d5',
-                            purple: '#6d28d9',
-                            gold: {
-                                DEFAULT: '#f59e0b',
-                                light: '#fbbf24',
-                                dark: '#d97706',
-                            }
-                        },
-                        slate: {
-                            850: '#151f32',
-                            950: '#070d17',
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
-                    }
-                }
-            }
-        }
-    </script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
 
     <style>
         [x-cloak] { display: none !important; }
@@ -130,7 +94,7 @@
                     <span x-show="!sidebarCollapsed" class="truncate">Publications & Papers</span>
                 </div>
                 <span x-show="!sidebarCollapsed" class="px-2 py-0.5 text-[10px] font-mono rounded bg-blue-950/60 text-amber-300 border border-blue-800/40">
-                    {{ \App\Models\Publication::count() }}
+                    {{ \App\Support\HubStats::publicationCount() }}
                 </span>
             </a>
 
@@ -152,6 +116,7 @@
                     Cockpit Modules
                 </div>
 
+                @if(Auth::user()->canReviewApplications())
                 <!-- Grant Applications Review -->
                 <a 
                     href="{{ route('admin.grants.index') }}" 
@@ -164,10 +129,12 @@
                         <span x-show="!sidebarCollapsed" class="truncate">Grant Applications</span>
                     </div>
                     <span x-show="!sidebarCollapsed" class="px-1.5 py-0.5 text-[10px] font-mono rounded bg-emerald-950 text-emerald-300 border border-emerald-800/40">
-                        {{ \App\Models\GrantApplication::where('status', 'submitted')->count() }}
+                        {{ \App\Support\HubStats::pendingGrantCount() }}
                     </span>
                 </a>
+                @endif
 
+                @if(Auth::user()->canManagePosts())
                 <!-- CMS News & Blogs -->
                 <a 
                     href="{{ route('admin.posts.index') }}" 
@@ -178,6 +145,7 @@
                     </svg>
                     <span x-show="!sidebarCollapsed" class="truncate">CMS News & Posts</span>
                 </a>
+                @endif
 
                 @if(Auth::user()->isSuperAdmin())
                     <div x-show="!sidebarCollapsed" class="pt-5 px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-amber-300/80">

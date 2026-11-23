@@ -10,6 +10,7 @@ use App\Services\ProjectService;
 use App\Services\ReportExportService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -24,20 +25,20 @@ class ProjectController extends Controller
     {
         $filters = $request->only(['search', 'status', 'category', 'year', 'organization']);
         $projects = $this->projectService->getFilteredPaginatedProjects($filters, 10);
-        $organizations = Organization::orderBy('name')->get();
+        $organizations = Organization::orderBy('name')->get(['id', 'name']);
         $categories = ['STEM', 'Educational Tech', 'Agriculture', 'Inclusive Education', 'Digital Humanities', 'Community Outreach'];
-        $years = Project::whereNotNull('start_date')
-            ->selectRaw("strftime('%Y', start_date) as year")
+        $yearExpr = Project::yearExpression();
+        $years = Cache::remember('hub.project_years', 300, fn () => Project::whereNotNull('start_date')
+            ->selectRaw("{$yearExpr} as year")
             ->distinct()
-            ->orderBy('year', 'desc')
-            ->pluck('year');
-
+            ->orderByDesc('year')
+            ->pluck('year'));
         return view('projects.index', compact('projects', 'organizations', 'categories', 'years', 'filters'));
     }
 
     public function create(): View
     {
-        $organizations = Organization::orderBy('name')->get();
+        $organizations = Organization::orderBy('name')->get(['id', 'name']);
         $categories = ['STEM', 'Educational Tech', 'Agriculture', 'Inclusive Education', 'Digital Humanities', 'Community Outreach'];
 
         return view('projects.create', compact('organizations', 'categories'));
@@ -59,7 +60,7 @@ class ProjectController extends Controller
 
     public function edit(Project $project): View
     {
-        $organizations = Organization::orderBy('name')->get();
+        $organizations = Organization::orderBy('name')->get(['id', 'name']);
         $categories = ['STEM', 'Educational Tech', 'Agriculture', 'Inclusive Education', 'Digital Humanities', 'Community Outreach'];
         $project->load('organizations');
 
