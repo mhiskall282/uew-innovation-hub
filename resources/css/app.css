@@ -4,25 +4,93 @@
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
+@source '../../app/Enums/*.php';
 
-@custom-variant dark (&:where(.dark, .dark *));
-
+/*
+ * UEW Innovation Hub design tokens.
+ * Brand: UEW navy, royal blue, imperial purple and academic gold.
+ * Workspace chrome follows the Npontu/Opsora operations style: dark
+ * sidebar, light canvas, dense data cards, monospace figures.
+ */
 @theme {
-    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
-    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+    --font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'Courier New', monospace;
 
-    --color-uew-navy: #102a72;
+    --color-uew-ink: #0a1128;
+    --color-uew-ink-soft: #131f42;
     --color-uew-navy-deep: #0a1b4d;
+    --color-uew-navy: #102a72;
     --color-uew-navy-light: #1e3a8a;
     --color-uew-royal: #3157d5;
+    --color-uew-royal-light: #4f75f5;
     --color-uew-purple: #6d28d9;
+    --color-uew-purple-light: #8b5cf6;
     --color-uew-gold: #f59e0b;
     --color-uew-gold-light: #fbbf24;
-    --color-uew-gold-dark: #d97706;
+    --color-uew-gold-dark: #b45309;
+    --color-uew-canvas: #f4f7fb;
 
-    --color-slate-850: #151f32;
-    --color-slate-950: #070d17;
+    --shadow-card: 0 1px 2px rgba(16, 42, 114, 0.04), 0 4px 16px rgba(16, 42, 114, 0.06);
+    --shadow-card-hover: 0 2px 4px rgba(16, 42, 114, 0.06), 0 12px 28px rgba(16, 42, 114, 0.1);
+    --shadow-glow-gold: 0 0 0 3px rgba(245, 158, 11, 0.25);
 }
 
-[x-cloak] { display: none !important; }
+@layer base {
+    html {
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--color-uew-royal);
+        outline-offset: 2px;
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+}
+
+@layer components {
+    /* Long-form article body rendered from Markdown. */
+    .prose-uew {
+        @apply text-[15px] leading-7 text-slate-700;
+    }
+    .prose-uew > * + * {
+        @apply mt-5;
+    }
+    .prose-uew h2 {
+        @apply mt-10 text-xl font-bold tracking-tight text-slate-900;
+    }
+    .prose-uew h3 {
+        @apply mt-8 text-lg font-semibold text-slate-900;
+    }
+    .prose-uew a {
+        @apply font-medium text-uew-royal underline underline-offset-2 hover:text-uew-navy;
+    }
+    .prose-uew ul {
+        @apply list-disc space-y-1.5 pl-6;
+    }
+    .prose-uew ol {
+        @apply list-decimal space-y-1.5 pl-6;
+    }
+    .prose-uew blockquote {
+        @apply border-l-4 border-uew-gold bg-amber-50/60 py-2 pl-4 text-slate-800 italic;
+    }
+    .prose-uew code {
+        @apply rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[13px] text-uew-navy;
+    }
+    .prose-uew strong {
+        @apply font-semibold text-slate-900;
+    }
+}
+
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    body {
+        background: #fff !important;
+    }
+}

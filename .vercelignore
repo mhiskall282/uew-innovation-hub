@@ -1,0 +1,15 @@
+.git
+.ai
+.kiro
+.env
+node_modules
+vendor
+legacy
+tests
+docs
+storage/logs
+storage/framework
+database/*.sqlite
+Dockerfile
+docker
+render.yaml

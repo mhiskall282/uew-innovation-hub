@@ -1,24 +1,47 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
+use App\Enums\Affiliation;
+use App\Enums\Permission;
+use App\Enums\Role;
+use App\Models\Concerns\Searchable;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+/**
+ * Staff and member accounts share one table; `role` tells them apart.
+ *
+ * @property Role $role
+ * @property Affiliation|null $affiliation
+ */
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, Searchable;
 
+    /**
+     * `role`, `is_active`, `email_verified_at` and `onboarded_at` are NOT mass
+     * assignable. Services set them explicitly so a crafted request can never
+     * escalate privileges or skip verification through fill().
+     */
     protected $fillable = [
         'name',
         'email',
-        'role',
         'department',
         'password',
+        'phone',
+        'affiliation',
+        'institution',
+        'bio',
+        'interests',
+        'marketing_opt_in',
     ];
 
     protected $hidden = [
@@ -26,10 +49,25 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $attributes = [
+        'role' => 'viewer',
+        'is_active' => true,
+        'marketing_opt_in' => false,
+    ];
+
     protected function casts(): array
     {
         return [
+            'role' => Role::class,
+            'affiliation' => Affiliation::class,
+            'is_active' => 'boolean',
+            'notify_new_grants' => 'boolean',
+            'notify_contact_messages' => 'boolean',
+            'marketing_opt_in' => 'boolean',
+            'interests' => 'array',
             'email_verified_at' => 'datetime',
+            'onboarded_at' => 'datetime',
+            'last_login_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
@@ -49,39 +87,93 @@ class User extends Authenticatable
         return $this->hasMany(ActivityLog::class);
     }
 
-    // Role Checks
+    public function applications(): HasMany
+    {
+        return $this->hasMany(ProgramApplication::class);
+    }
+
+    public function hasPermission(Permission $permission): bool
+    {
+        return $this->is_active && $this->role->allows($permission);
+    }
+
     public function isSuperAdmin(): bool
     {
-        return $this->role === 'super_admin';
+        return $this->role === Role::SuperAdmin;
     }
 
-    public function isOfficer(): bool
+    public function isMember(): bool
     {
-        return in_array($this->role, ['super_admin', 'officer']);
+        return $this->role === Role::Member;
     }
 
-    public function isReviewer(): bool
+    public function isStaff(): bool
     {
-        return in_array($this->role, ['super_admin', 'officer', 'reviewer']);
+        return $this->role->isStaff();
     }
 
-    public function isIntern(): bool
+    public function hasVerifiedEmail(): bool
     {
-        return $this->role === 'intern';
+        return $this->email_verified_at !== null;
     }
 
-    public function canManageProjects(): bool
+    /** Members must finish onboarding; staff never need to. */
+    public function needsOnboarding(): bool
     {
-        return in_array($this->role, ['super_admin', 'officer']);
+        return $this->isMember() && $this->onboarded_at === null;
     }
 
-    public function canManagePosts(): bool
+    /** Where this account lands after signing in. */
+    public function homeUrl(): string
     {
-        return in_array($this->role, ['super_admin', 'officer', 'intern']);
+        return $this->isStaff() ? route('workspace.dashboard') : route('portal.dashboard');
     }
 
-    public function canReviewApplications(): bool
+    public function firstName(): string
     {
-        return in_array($this->role, ['super_admin', 'officer', 'reviewer']);
+        return explode(' ', trim($this->name))[0] ?: $this->name;
+    }
+
+    public function initials(): string
+    {
+        return collect(preg_split('/\s+/', trim($this->name)) ?: [])
+            ->filter(fn ($part) => preg_match('/^\p{L}/u', $part))
+            ->take(2)
+            ->map(fn ($part) => mb_strtoupper(mb_substr($part, 0, 1)))
+            ->join('') ?: 'U';
+    }
+
+    /** Profile fields filled in, for the portal completeness meter. */
+    public function profileCompleteness(): int
+    {
+        $checks = [
+            filled($this->name), filled($this->phone), $this->affiliation !== null,
+            filled($this->institution), filled($this->bio), ! empty($this->interests), $this->hasVerifiedEmail(),
+        ];
+
+        return (int) round(count(array_filter($checks)) / count($checks) * 100);
+    }
+
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('is_active', true);
+    }
+
+    public function scopeStaff(Builder $query): Builder
+    {
+        return $query->where('role', '!=', Role::Member->value);
+    }
+
+    public function scopeMembers(Builder $query): Builder
+    {
+        return $query->where('role', Role::Member->value);
+    }
+
+    /** Active users whose role grants the permission. */
+    public function scopeWithPermission(Builder $query, Permission $permission): Builder
+    {
+        $roles = collect(Role::cases())->filter(fn (Role $r) => $r->allows($permission))->map->value->all();
+
+        return $query->active()->whereIn('role', $roles);
     }
 }

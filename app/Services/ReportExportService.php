@@ -1,106 +1,86 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\Project;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class ReportExportService
+/**
+ * Streams the project portfolio as CSV. Rows are read in chunks so memory use
+ * stays flat regardless of portfolio size.
+ */
+final class ReportExportService
 {
-    public function exportCsv(array $filters): StreamedResponse
+    private const HEADINGS = [
+        'ID', 'Title', 'Focus area', 'Status', 'Visibility', 'Start date', 'End date',
+        'Beneficiaries target', 'Beneficiaries reached', 'Progress %', 'Grant amount (GHS)',
+        'Lead researcher', 'Department', 'Partners', 'Report on file',
+    ];
+
+    /**
+     * @param  array<string, mixed>  $filters
+     */
+    public function projectsCsv(array $filters): StreamedResponse
     {
-        $query = Project::with('organizations')
+        $query = Project::query()
+            ->with('organizations:id,name')
             ->filter($filters)
             ->orderByDesc('start_date')
             ->orderByDesc('id');
 
-        $headers = [
-            'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="uew_innovation_hub_projects_' . date('Y-m-d') . '.csv"',
-            'Pragma' => 'no-cache',
-            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
-            'Expires' => '0',
-        ];
+        $filename = 'uew-innovation-hub-projects-'.now()->format('Y-m-d').'.csv';
 
-        $callback = function () use ($query) {
-            $handle = fopen('php://output', 'w');
-            // Output UTF-8 BOM for Excel compatibility
-            fputs($handle, "\xEF\xBB\xBF");
-
-            fputcsv($handle, [
-                'Project ID',
-                'Project Title',
-                'Category',
-                'Status',
-                'Start Date',
-                'End Date',
-                'Beneficiaries Target',
-                'Beneficiaries Reached',
-                'Grant Amount (GHS)',
-                'Lead Researcher',
-                'Partner Organizations & Roles',
-                'Report Uploaded',
-            ]);
-
-            $totalBeneficiaries = 0;
-            $totalGrant = 0;
+        return response()->streamDownload(function () use ($query) {
+            $out = fopen('php://output', 'w');
+            fwrite($out, "\xEF\xBB\xBF"); // UTF-8 BOM so Excel detects the encoding
+            fputcsv($out, self::HEADINGS);
 
             $count = 0;
-            $query->chunk(500, function ($projects) use ($handle, &$totalBeneficiaries, &$totalGrant, &$count) {
-            foreach ($projects as $p) {
-                $count++;
-                $orgsList = $p->organizations->map(fn($o) => "{$o->name} ({$o->pivot->role})")->join('; ');
-                $totalBeneficiaries += $p->beneficiaries_reached;
-                $totalGrant += (float) $p->grant_amount;
+            $reached = 0;
+            $funding = 0.0;
 
-                fputcsv($handle, [
-                    $p->id,
-                    $this->safe($p->title),
-                    $p->category,
-                    strtoupper($p->status),
-                    $p->start_date ? $p->start_date->format('d M Y') : 'N/A',
-                    $p->end_date ? $p->end_date->format('d M Y') : 'N/A',
-                    $p->beneficiaries_target,
-                    $p->beneficiaries_reached,
-                    number_format((float) $p->grant_amount, 2),
-                    $this->safe($p->lead_researcher ?? 'N/A'),
-                    $this->safe($orgsList ?: 'None'),
-                    $p->report_file_path ? 'Yes' : 'No',
+            // lazy() pages through results 500 at a time while keeping the sort order.
+            foreach ($query->lazy(500) as $project) {
+                $count++;
+                $reached += $project->beneficiaries_reached;
+                $funding += (float) $project->grant_amount;
+
+                fputcsv($out, [
+                    $project->id,
+                    $this->cell($project->title),
+                    $this->cell($project->category),
+                    $project->status->label(),
+                    $project->is_public ? 'Public' : 'Internal',
+                    $project->start_date?->format('Y-m-d') ?? '',
+                    $project->end_date?->format('Y-m-d') ?? '',
+                    $project->beneficiaries_target,
+                    $project->beneficiaries_reached,
+                    $project->progress,
+                    number_format((float) $project->grant_amount, 2, '.', ''),
+                    $this->cell($project->lead_researcher),
+                    $this->cell($project->department),
+                    $this->cell($project->organizations->map(fn ($o) => "{$o->name} ({$o->pivot->role})")->join('; ')),
+                    $project->report_file_path ? 'Yes' : 'No',
                 ]);
             }
-            });
 
-            // Summary row
-            fputcsv($handle, [
-                '',
-                'TOTAL (' . $count . ' Projects)',
-                '',
-                '',
-                '',
-                '',
-                '',
-                $totalBeneficiaries,
-                number_format($totalGrant, 2),
-                '',
-                '',
-                '',
-            ]);
-
-            fclose($handle);
-        };
-
-        return response()->stream($callback, 200, $headers);
+            fputcsv($out, ['', "TOTAL ({$count} projects)", '', '', '', '', '', '', $reached, '', number_format($funding, 2, '.', ''), '', '', '', '']);
+            fclose($out);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Cache-Control' => 'no-store',
+        ]);
     }
 
     /**
-     * Neutralise spreadsheet formula injection (=, +, -, @) in user-supplied cells.
+     * Prevents spreadsheet formula injection from user-entered text.
      */
-    private function safe(?string $value): string
+    private function cell(?string $value): string
     {
         $value = (string) $value;
 
-        return $value !== '' && in_array($value[0], ['=', '+', '-', '@', "\t", "\r"], true)
-            ? "'" . $value
-            : $value;
+        return $value !== '' && in_array($value[0], ['=', '+', '-', '@', "\t", "\r"], true) ? "'{$value}" : $value;
     }
 }

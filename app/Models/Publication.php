@@ -1,29 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
+use App\Models\Concerns\FlushesMetrics;
+use App\Models\Concerns\HasUniqueSlug;
+use App\Models\Concerns\Searchable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Str;
 
 class Publication extends Model
 {
-    use HasFactory, SoftDeletes;
+    use FlushesMetrics, HasFactory, HasUniqueSlug, Searchable, SoftDeletes;
 
     protected $fillable = [
         'legacy_id',
         'project_id',
         'title',
-        'slug',
         'type',
         'authors',
+        'abstract',
         'publish_date',
         'journal_name',
         'doi_url',
         'pdf_file_path',
-        'downloads_count',
+    ];
+
+    protected $attributes = [
+        'downloads_count' => 0,
     ];
 
     protected function casts(): array
@@ -34,23 +41,13 @@ class Publication extends Model
         ];
     }
 
-    protected static function booted(): void
-    {
-        static::creating(function (Publication $publication) {
-            if (empty($publication->slug)) {
-                $baseSlug = Str::slug($publication->title);
-                $slug = $baseSlug;
-                $counter = 1;
-                while (static::where('slug', $slug)->exists()) {
-                    $slug = $baseSlug . '-' . $counter++;
-                }
-                $publication->slug = $slug;
-            }
-        });
-    }
-
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
+    }
+
+    public function hasDocument(): bool
+    {
+        return ! empty($this->pdf_file_path);
     }
 }
