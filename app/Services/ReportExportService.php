@@ -1,0 +1,90 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Project;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+
+class ReportExportService
+{
+    public function exportCsv(array $filters): StreamedResponse
+    {
+        $projects = Project::with('organizations')
+            ->filter($filters)
+            ->latest('start_date')
+            ->get();
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="uew_innovation_hub_projects_' . date('Y-m-d') . '.csv"',
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+
+        $callback = function () use ($projects) {
+            $handle = fopen('php://output', 'w');
+            // Output UTF-8 BOM for Excel compatibility
+            fputs($handle, "\xEF\xBB\xBF");
+
+            fputcsv($handle, [
+                'Project ID',
+                'Project Title',
+                'Category',
+                'Status',
+                'Start Date',
+                'End Date',
+                'Beneficiaries Target',
+                'Beneficiaries Reached',
+                'Grant Amount (GHS)',
+                'Lead Researcher',
+                'Partner Organizations & Roles',
+                'Report Uploaded',
+            ]);
+
+            $totalBeneficiaries = 0;
+            $totalGrant = 0;
+
+            foreach ($projects as $p) {
+                $orgsList = $p->organizations->map(fn($o) => "{$o->name} ({$o->pivot->role})")->join('; ');
+                $totalBeneficiaries += $p->beneficiaries_reached;
+                $totalGrant += (float) $p->grant_amount;
+
+                fputcsv($handle, [
+                    $p->id,
+                    $p->title,
+                    $p->category,
+                    strtoupper($p->status),
+                    $p->start_date ? $p->start_date->format('d M Y') : 'N/A',
+                    $p->end_date ? $p->end_date->format('d M Y') : 'N/A',
+                    $p->beneficiaries_target,
+                    $p->beneficiaries_reached,
+                    number_format((float) $p->grant_amount, 2),
+                    $p->lead_researcher ?? 'N/A',
+                    $orgsList ?: 'None',
+                    $p->report_file_path ? 'Yes' : 'No',
+                ]);
+            }
+
+            // Summary row
+            fputcsv($handle, [
+                '',
+                'TOTAL (' . count($projects) . ' Projects)',
+                '',
+                '',
+                '',
+                '',
+                '',
+                $totalBeneficiaries,
+                number_format($totalGrant, 2),
+                '',
+                '',
+                '',
+            ]);
+
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+}
