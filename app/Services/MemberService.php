@@ -25,7 +25,7 @@ final class MemberService
     ) {}
 
     /**
-     * @param  array{name: string, email: string, password: string}  $data
+     * @param  array{name: string, email: string, password: string, phone?: ?string, gender?: ?string, date_of_birth?: ?string, region?: ?string}  $data
      */
     public function register(array $data): User
     {
@@ -34,6 +34,10 @@ final class MemberService
                 'name' => $data['name'],
                 'email' => mb_strtolower(trim($data['email'])),
                 'password' => $data['password'],
+                'phone' => $data['phone'] ?? null,
+                'gender' => $data['gender'] ?? null,
+                'date_of_birth' => $data['date_of_birth'] ?? null,
+                'region' => $data['region'] ?? null,
             ]);
             $user->role = Role::Member;
             $user->is_active = true;
@@ -108,13 +112,19 @@ final class MemberService
     {
         $user->fill([
             'name' => $data['name'] ?? $user->name,
-            'phone' => $data['phone'] ?? null,
+            'phone' => $data['phone'] ?? $user->phone,
+            'gender' => $data['gender'] ?? $user->gender,
+            'date_of_birth' => $data['date_of_birth'] ?? $user->date_of_birth,
+            'region' => $data['region'] ?? $user->region,
             'affiliation' => $data['affiliation'] ?? null,
             'institution' => $data['institution'] ?? null,
             'department' => $data['department'] ?? null,
+            'education_level' => $data['education_level'] ?? null,
+            'disability' => $data['disability'] ?? null,
             'bio' => $data['bio'] ?? null,
             'interests' => array_values($data['interests'] ?? []),
             'marketing_opt_in' => (bool) ($data['marketing_opt_in'] ?? false),
+            'public_profile' => (bool) ($data['public_profile'] ?? false),
         ]);
     }
 }

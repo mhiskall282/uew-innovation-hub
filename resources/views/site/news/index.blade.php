@@ -1,17 +1,15 @@
 <x-layouts.site title="News" description="News, stories and announcements from the UEW Innovation Hub.">
-    <section class="border-b border-slate-200 bg-uew-canvas">
-        <div class="mx-auto max-w-7xl px-6 py-14">
-            <p class="text-xs font-bold tracking-widest text-uew-gold-dark uppercase">Newsroom</p>
-            <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">News and stories</h1>
-            <p class="mt-3 max-w-2xl text-slate-600">Announcements, funding calls and stories from our researchers and partners.</p>
-            <nav class="mt-8 flex flex-wrap gap-2" aria-label="Filter by type">
+    <x-ui.page-hero eyebrow="Newsroom" title="News and stories" photo="north-campus">
+        Announcements, funding calls and stories from our researchers and partners.
+        <x-slot:below>
+            <nav class="flex flex-wrap gap-2" aria-label="Filter by type">
                 <a href="{{ route('site.news.index') }}" @class(['rounded-full px-3.5 py-1.5 text-xs font-semibold ring-1 ring-inset', 'bg-uew-navy text-white ring-uew-navy' => ! $activeType, 'bg-white text-slate-600 ring-slate-300 hover:bg-slate-50' => $activeType])>Everything</a>
                 @foreach ($types as $type)
                     <a href="{{ route('site.news.index', ['type' => $type->value]) }}" @class(['rounded-full px-3.5 py-1.5 text-xs font-semibold ring-1 ring-inset', 'bg-uew-navy text-white ring-uew-navy' => $activeType === $type, 'bg-white text-slate-600 ring-slate-300 hover:bg-slate-50' => $activeType !== $type])>{{ Str::plural($type->label()) }}</a>
                 @endforeach
             </nav>
-        </div>
-    </section>
+        </x-slot:below>
+    </x-ui.page-hero>
 
     <section class="mx-auto max-w-7xl px-6 py-12">
         @if ($posts->isEmpty())

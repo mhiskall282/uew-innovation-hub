@@ -1,18 +1,15 @@
 <x-layouts.site title="Programmes" description="Grants, fellowships, incubation, competitions, training and events at the UEW Innovation Hub.">
-    <section class="relative overflow-hidden bg-uew-ink text-white">
-        <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_85%_20%,rgba(109,40,217,0.4),transparent_50%),radial-gradient(circle_at_10%_80%,rgba(49,87,213,0.35),transparent_50%)]"></div>
-        <div class="relative mx-auto max-w-7xl px-6 py-16">
-            <p class="text-xs font-bold tracking-widest text-uew-gold-light uppercase">Opportunities</p>
-            <h1 class="mt-2 text-3xl font-extrabold tracking-tight sm:text-5xl">Programmes</h1>
-            <p class="mt-4 max-w-2xl text-blue-100/80">Grants, fellowships, incubation cohorts, competitions, training and events. Create a free account once, then apply to any open programme and follow your applications online.</p>
-            @guest
-                <div class="mt-8 flex flex-wrap gap-3">
+    <x-ui.page-hero eyebrow="Opportunities" title="Programmes" photo="study-kiosk">
+        Grants, fellowships, incubation cohorts, competitions, training and events. Create a free account once, then apply to any open programme and follow your applications online.
+        @guest
+            <x-slot:below>
+                <div class="flex flex-wrap gap-3">
                     <x-ui.button :href="route('register')" variant="gold" icon-right="arrow-right">Create a free account</x-ui.button>
                     <x-ui.button :href="route('login')" variant="light">I already have an account</x-ui.button>
                 </div>
-            @endguest
-        </div>
-    </section>
+            </x-slot:below>
+        @endguest
+    </x-ui.page-hero>
 
     <section class="mx-auto max-w-7xl px-6 py-10">
         {{-- Tabs --}}

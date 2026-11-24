@@ -21,6 +21,8 @@ class IndexController extends ApiController
                 'publications' => route('api.v1.publications.index'),
                 'news' => route('api.v1.news.index'),
                 'partners' => route('api.v1.partners.index'),
+                'programmes' => route('api.v1.programmes.index'),
+                'community' => route('api.v1.community'),
             ],
         ]);
     }

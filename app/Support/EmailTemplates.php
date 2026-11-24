@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Support;
 
 use App\Models\EmailTemplate;
+use App\Services\SettingsService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
@@ -173,7 +174,7 @@ final class EmailTemplates
     /** @param array<string, mixed> $values */
     private static function withDefaults(array $values): array
     {
-        $settings = app(\App\Services\SettingsService::class);
+        $settings = app(SettingsService::class);
 
         return $values + [
             'site_name' => config('hub.name'),

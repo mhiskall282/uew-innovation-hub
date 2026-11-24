@@ -1,0 +1,143 @@
+# Continuous integration for the UEW Innovation Hub.
+#
+# Every push and pull request runs code style, the asset build, a Blade
+# compile check and the full test suite on SQLite and on PostgreSQL (the
+# production database). Render deploys main automatically (autoDeploy in
+# render.yaml) once this workflow is green; enable "Wait for CI" / branch
+# protection on main in GitHub so a failing build never ships.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  PHP_VERSION: '8.4'
+  NODE_VERSION: '22'
+
+jobs:
+  lint:
+    name: Code style
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          coverage: none
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - run: vendor/bin/pint --test
+
+  assets:
+    name: Front-end build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: public/build
+          retention-days: 3
+
+  tests:
+    name: Tests (${{ matrix.database }})
+    needs: assets
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        database: [sqlite, pgsql]
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: uew_test
+          POSTGRES_USER: uew
+          POSTGRES_PASSWORD: uew
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U uew" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: pdo_sqlite, pdo_pgsql, intl, gd, zip
+          coverage: none
+      - uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: public/build
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+      - name: Use PostgreSQL
+        if: matrix.database == 'pgsql'
+        run: |
+          echo "DB_CONNECTION=pgsql" >> "$GITHUB_ENV"
+          echo "DB_URL=pgsql://uew:uew@127.0.0.1:5432/uew_test" >> "$GITHUB_ENV"
+          echo "DB_DATABASE=uew_test" >> "$GITHUB_ENV"
+      - name: Migrations run cleanly (up, down, up)
+        if: matrix.database == 'pgsql'
+        run: |
+          php artisan migrate --force
+          php artisan migrate:rollback --step=1 --force
+          php artisan migrate --force
+          php artisan db:seed --force
+      - name: Blade templates compile
+        run: |
+          php artisan view:cache
+          find storage/framework/views -name '*.php' -print0 | xargs -0 -n1 php -l > /dev/null
+          php artisan view:clear
+      - name: Test suite
+        run: php vendor/bin/phpunit --no-progress
+        env:
+          DB_CONNECTION: ${{ matrix.database }}
+          DB_DATABASE: ${{ matrix.database == 'pgsql' && 'uew_test' || ':memory:' }}
+          DB_URL: ${{ matrix.database == 'pgsql' && 'pgsql://uew:uew@127.0.0.1:5432/uew_test' || '' }}
+
+  security:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          coverage: none
+      - run: composer audit --no-interaction
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - run: npm audit --omit=dev --audit-level=high
+
+  docker:
+    name: Docker image builds
+    needs: [lint, tests]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

@@ -5,6 +5,7 @@ namespace Tests\Unit;
 use App\Enums\Permission;
 use App\Enums\Role;
 use App\Support\Format;
+use App\Support\FormSchema;
 use PHPUnit\Framework\TestCase;
 
 class DomainTest extends TestCase
@@ -37,7 +38,7 @@ class DomainTest extends TestCase
 
     public function test_form_schema_normalises_keys_and_drops_invalid_fields(): void
     {
-        $fields = \App\Support\FormSchema::normalize([
+        $fields = FormSchema::normalize([
             ['label' => 'Team name', 'type' => 'short_text'],
             ['label' => 'Team name', 'type' => 'short_text'],
             ['label' => 'Pick one', 'type' => 'select', 'options' => "A\nB\n\nA"],

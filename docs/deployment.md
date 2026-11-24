@@ -25,7 +25,7 @@ php artisan serve
 
 Sign in at http://localhost:8000/sign-in (demo accounts are listed in the README; password `password`).
 
-With `MAIL_MAILER=log`, e-mails (including verification codes) are written to `storage/logs/laravel.log`, and the code is also shown on the verification screen in local mode. Run `php artisan queue:work` to process queued e-mails and broadcasts.
+Verification and reset codes are only ever delivered by e-mail; the app never shows them on screen. With `MAIL_MAILER=log` (local development only) e-mails are written to `storage/logs/laravel.log`, so a developer can read the code there. On any shared or hosted site configure real SMTP under **Site settings > E-mail delivery** so codes reach people's inboxes. Run `php artisan queue:work` to process queued e-mails and broadcasts.
 
 **After pulling new code**, always run:
 

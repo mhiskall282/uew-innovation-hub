@@ -70,6 +70,34 @@
                 @endif
             </x-ui.card>
 
+            @php $level = $user->level(); @endphp
+            <section class="relative overflow-hidden rounded-xl bg-uew-ink p-5 text-white shadow-card">
+                <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_90%_0%,rgba(245,158,11,0.35),transparent_55%)]"></div>
+                <div class="relative">
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <p class="font-mono text-[10px] font-bold tracking-widest text-uew-gold-light uppercase">Your level</p>
+                            <p class="mt-1 text-xl font-extrabold">{{ $level['name'] }}</p>
+                        </div>
+                        <p class="font-mono text-2xl font-bold">{{ number_format($user->xp) }}<span class="ml-1 text-xs text-blue-100/70">XP</span></p>
+                    </div>
+                    <x-ui.progress class="mt-4" :value="$level['progress']" tone="gold" />
+                    <p class="mt-2 text-xs text-blue-100/70">{{ $level['next'] ? number_format($level['next'] - $user->xp) . ' XP to ' . $level['next_name'] : 'Highest level reached' }}</p>
+                    @if ($achievements->isNotEmpty())
+                        <ul class="mt-4 flex flex-wrap gap-2">
+                            @foreach ($achievements as $achievement)
+                                <li class="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-semibold ring-1 ring-white/15" title="{{ $achievement->title }}">
+                                    <x-ui.icon :name="$achievement->type->icon()" class="size-3.5 text-uew-gold-light" /> {{ \Illuminate\Support\Str::limit($achievement->title, 32) }}
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                    <a href="{{ $user->public_profile ? route('site.community.show', $user) : route('portal.profile.edit') }}" class="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-uew-gold-light hover:underline">
+                        {{ $user->public_profile ? 'View my public profile' : 'Appear on the community leaderboard' }} <x-ui.icon name="arrow-right" class="size-3.5" />
+                    </a>
+                </div>
+            </section>
+
             <x-ui.card title="Your interests">
                 <div class="flex flex-wrap gap-2">
                     @forelse ($user->interests ?? [] as $interest)

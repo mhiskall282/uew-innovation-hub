@@ -1,45 +1,42 @@
-# Current System State & Migration Status
+# Current System State
 
-> **Platform**: UEW Innovation Hub Enterprise  
-> **Last Updated**: 2026-11-23  
-> **Current Status**: Complete Production-Ready Enterprise Laravel 12 Architecture  
+> **Platform**: UEW Innovation Hub
+> **Last updated**: 2026-11-24
+> **Version**: 1.3.0 (see `changelog.md`)
+> **Live test site**: https://uew-innovation-hub.onrender.com (Render, Docker + PostgreSQL, auto-deploys `main`)
 
----
+## 1. Summary
 
-## 1. System State Summary
+Laravel 12 / PHP 8.4 / Blade / Tailwind v4 / Alpine.js. One `users` table with roles `super_admin`, `officer`, `reviewer`, `intern`, `viewer` (staff) and `member`. Permission matrix in `app/Enums/Role.php`; every `Permission` case is a Gate.
 
-The repository has been successfully overhauled from a legacy native procedural PHP codebase into an enterprise-grade Laravel 12 application with a full Npontu SRE cockpit design, UEW institutional brand tokens, CMS news & blogs engine, public grant application subsystem, and comprehensive automated test coverage.
+## 2. Modules
 
-```text
-[Legacy Procedural PHP] ─── (Architectural Overhaul) ───▶ [Enterprise Laravel 12 + Npontu Cockpit + CMS]
-  • 12 standalone PHP files                                • Full MVC + Domain Service Layer
-  • Raw MySQL queries                                      • Eloquent ORM + 7 Migrations + Seeders
-  • Ad-hoc Vanilla CSS                                     • Tailwind CSS v4 + UEW Brand Tokens
-  • Basic sessions                                         • Granular Multi-Role RBAC (5 Roles)
-  • No CMS or Grants portal                                • Dynamic CMS + Public Grant Applications
-  • 0 tests                                                • 22 Passing Automated Feature/Unit Tests
-```
+| Module | Key code | Status |
+| --- | --- | --- |
+| Public site | `Site\*Controller`, `components/layouts/site`, `x-ui.page-hero`, `App\Support\Photos` | Live |
+| Accounts (sign-up, OTP verify, onboarding, reset) | `Auth\*`, `MemberService`, `VerificationService` | Live |
+| Programmes + form builder (profile pre-fill) | `ProgramService`, `FormSchema`, `Demographics` | Live |
+| Applications (drafts, submit, review, bulk, snapshot) | `ApplicationService`, `ProgramApplicationPolicy` | Live |
+| Notifications (bell, inbox) | `NotificationCenter`, `HubNotification`, `NotificationController` | New in 1.3 |
+| Application messages | `ConversationService`, `Portal/Workspace\MessageController` | New in 1.3 |
+| Progress & budget reports, Incubation board | `ProgressReportService`, `ProgressReportPolicy` | New in 1.3 |
+| Badges, XP, community leaderboard | `EngagementService`, `Achievement`, `Site\CommunityController` | New in 1.3 |
+| Members, broadcasts, CMS pages, templates, SMTP settings | `MemberController`, `BroadcastService`, `PageController`, `EmailTemplates`, `MailSettings` | Live |
+| Portfolio (projects, publications, partners, news) | `ProjectService`, `PublicationService`, `PostService` | Live |
+| Legacy grant applications | `GrantApplicationService` (read/review only) | Live |
+| Reports | `Workspace\ReportController` | Live |
+| Open API v1 | `Api\V1\*` (stats, projects, publications, news, partners, programmes, community) | Live |
 
----
+## 3. Verification
 
-## 2. Architecture & Modules Overview
+- 122 PHPUnit tests (feature + unit) incl. `RouteSmokeTest` (every GET route × 8 actors, no 5xx) and `EngagementTest` (IDOR, open redirect, privacy).
+- CI: `.github/workflows/ci.yml` (Pint, build, Blade lint, SQLite + PostgreSQL tests, audits, Docker build).
+- Live black-box check: security headers, cookies, CSRF, sensitive paths, auth redirects (see `docs/security.md`).
 
-| Subsystem | Components & Controllers | Key Capabilities | Status |
-| :--- | :--- | :--- | :--- |
-| **Cockpit Telemetry** | `DashboardController`, `ProjectService`, `x-npontu.*` | Real-time SRE metrics, grant capital counters, beneficiary progress tracking | **Live & Verified** |
-| **Projects Registry** | `ProjectController`, `StoreProjectRequest`, `UpdateProjectRequest` | Full CRUD, multi-criteria filtering, partner org assignments, Excel/CSV export | **Live & Verified** |
-| **CMS News & Blogs** | `PostController`, `StorePostRequest`, `Post` Model | Dynamic news, research blogs, and announcements with authoring and public reader | **Live & Verified** |
-| **Grant Applications** | `GrantApplicationController`, `StoreGrantApplicationRequest` | Public application portal, tracking reference generation, committee review dossier | **Live & Verified** |
-| **Strategic Partners** | `OrganizationController`, `Organization` Model | Management of funding agencies, government ministries (GES, MESTI), and NGOs | **Live & Verified** |
-| **Publications Subsystem** | `PublicationController`, `Publication` Model | Research papers, policy briefs, quarterly newsletters with direct PDF streaming | **Live & Verified** |
-| **Access Control (RBAC)**| `UserController`, `AuthController`, `User` Model | 5 distinct roles: Super Admin, Officer, Reviewer, Intern/NSS, and Viewer | **Live & Verified** |
-| **Document Security** | `FileStreamController`, Private Disk Storage | Encrypted storage (`storage/app/private/`), nosniff headers, traversal defense | **Live & Verified** |
-| **Public Showcase Portal**| `LandingController`, `landing.blade.php` | Institutional landing page showcasing pillars, stats, partners, and grant CTA | **Live & Verified** |
+## 4. Open items
 
----
-
-## 3. Verification & Test Metrics
-
-- **Total Automated Tests**: 22 passing tests (54 assertions).
-- **Execution Time**: ~4.0s.
-- **Coverage**: Authentication, CSRF & File Security, Grant Intake & Review, CMS Authoring, Project CRUD & Export, and Role Provisioning.
+- Uploaded documents on Render's free plan are lost on redeploy until `DOCUMENTS_DISK=s3` (R2/S3) is configured.
+- Render free Postgres expires after 30 days; move to a paid plan or Neon before launch.
+- Real SMTP credentials to be entered in Site settings → E-mail (currently `MAIL_MAILER=log`).
+- Set `SEED_DEMO_DATA=false` and use a fresh database for the real launch.
+- CSP keeps `'unsafe-eval'` for Alpine.js.

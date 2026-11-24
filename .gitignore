@@ -27,3 +27,7 @@ database/database.sqlite
 database/database.sqlite-journal
 npm-debug.log
 yarn-error.log
+
+# Local QA artefacts
+/storage/shots/
+/storage/*.ps1

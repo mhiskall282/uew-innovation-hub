@@ -86,7 +86,8 @@
     <footer class="bg-uew-ink text-blue-100/75">
         <div class="mx-auto grid max-w-7xl gap-10 px-6 py-14 md:grid-cols-12">
             <div class="md:col-span-4">
-                <div class="flex items-center gap-3">
+                <img src="{{ asset('images/uew/uew-logo-white.png') }}" alt="University of Education, Winneba" width="216" height="36" class="h-9 w-auto opacity-95">
+                <div class="mt-5 flex items-center gap-3">
                     <x-ui.crest class="size-10" />
                     <span class="text-base font-bold text-white">UEW Innovation Hub</span>
                 </div>
@@ -110,6 +111,7 @@
                     <li><a href="{{ route('site.publications.index') }}" class="hover:text-white">Publications</a></li>
                     <li><a href="{{ route('site.news.index') }}" class="hover:text-white">News</a></li>
                     <li><a href="{{ route('site.partners.index') }}" class="hover:text-white">Partners</a></li>
+                    <li><a href="{{ route('site.community.index') }}" class="hover:text-white">Community &amp; leaderboard</a></li>
                 </ul>
             </div>
 
@@ -149,7 +151,7 @@
         </div>
         <div class="border-t border-white/10">
             <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-6 py-5 text-xs text-blue-100/50">
-                <p>© {{ now()->year }} University of Education, Winneba. All rights reserved.</p>
+                <p>© {{ now()->year }} University of Education, Winneba. All rights reserved. · Campus photos from Wikimedia Commons (CC BY / CC BY-SA).</p>
                 <p>Personal data is processed in line with the Data Protection Act, 2012 (Act 843).</p>
             </div>
         </div>

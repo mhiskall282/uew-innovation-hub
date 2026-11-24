@@ -15,15 +15,23 @@
     @endphp
 
     {{-- Hero --}}
-    <section class="relative overflow-hidden bg-uew-ink text-white">
-        <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(49,87,213,0.45),transparent_50%),radial-gradient(circle_at_85%_70%,rgba(109,40,217,0.35),transparent_45%)]"></div>
-        <div class="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:radial-gradient(#fbbf24_1px,transparent_1px)] [background-size:26px_26px]"></div>
+    @php $hero = \App\Support\Photos::get('monument'); @endphp
+    <section class="relative isolate overflow-hidden bg-uew-ink text-white">
+        <img src="{{ asset($hero['src']) }}" alt="" aria-hidden="true" fetchpriority="high" decoding="async"
+             class="absolute inset-0 -z-20 size-full object-cover object-[70%_center] opacity-70">
+        <div class="absolute inset-0 -z-10 bg-gradient-to-r from-uew-ink via-uew-ink/90 to-uew-navy/40"></div>
+        <div class="absolute inset-0 -z-10 bg-gradient-to-t from-uew-ink/80 via-transparent to-transparent"></div>
+        <div class="absolute inset-x-0 bottom-0 -z-10 h-1 bg-gradient-to-r from-uew-gold via-uew-gold-light to-uew-red"></div>
+        <p class="absolute right-3 bottom-2.5 text-[10px] text-white/45"><a href="{{ $hero['source'] }}" target="_blank" rel="noopener" class="hover:text-white/80">{{ \App\Support\Photos::credit('monument') }}</a></p>
 
         <div class="relative mx-auto grid max-w-7xl gap-14 px-6 py-20 lg:grid-cols-12 lg:py-28">
             <div class="lg:col-span-7">
-                <p class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-uew-gold-light ring-1 ring-white/15 ring-inset">
-                    <x-ui.icon name="academic" class="size-4" /> {{ $content['hero_eyebrow'] }}
-                </p>
+                <div class="flex items-center gap-4">
+                    <img src="{{ asset('images/uew/uew-logo.png') }}" alt="University of Education, Winneba crest" width="56" height="55" class="size-14 rounded-full bg-white p-1 shadow-lg shadow-black/30">
+                    <p class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-uew-gold-light ring-1 ring-white/15 ring-inset backdrop-blur">
+                        <x-ui.icon name="academic" class="size-4" /> {{ $content['hero_eyebrow'] }}
+                    </p>
+                </div>
                 <h1 class="mt-6 text-4xl leading-[1.1] font-extrabold tracking-tight sm:text-5xl lg:text-6xl">{{ $content['hero_title'] }}</h1>
                 <p class="mt-6 max-w-xl text-base leading-relaxed text-blue-100/80 sm:text-lg">{{ $content['hero_subtitle'] }}</p>
                 <div class="mt-9 flex flex-wrap gap-3">

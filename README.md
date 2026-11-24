@@ -6,8 +6,9 @@ It has three parts:
 
 | Part | URL | Who uses it |
 | --- | --- | --- |
-| Public website | `/` | Anyone: browse projects, publications, news and partners; apply for funding; track an application |
-| Staff workspace | `/workspace` | Hub staff, by role: manage projects, review grants, publish content, manage staff |
+| Public website | `/` | Anyone: programmes, projects, publications, news, partners and the community leaderboard |
+| Member portal | `/portal` | Members: apply, message the Hub, track decisions, submit progress and budget reports, earn badges |
+| Staff workspace | `/workspace` | Hub staff, by role: programmes, reviews, incubation board, members, broadcasts, content, reports, administration |
 | Open data API | `/api/v1` | Partners and developers: read-only JSON for public data |
 
 Everyone signs in at `/sign-in` (`/login` redirects there). Staff land in the workspace, members in their portal.
@@ -23,12 +24,21 @@ Built with Laravel 12, PHP 8.4, Blade, Tailwind CSS v4 and Alpine.js. Runs on SQ
 - News, blog posts and announcements written in Markdown
 - Programmes (grants, fellowships, incubation, competitions, training, events) with open / upcoming / closed tabs
 - Member accounts: sign-up, 6-digit e-mail verification, onboarding with interests, password reset by code
-- Member portal: apply with custom forms, save drafts, upload PDFs, track status, withdraw
+- Member portal: apply with custom forms (answers pre-filled from the profile), save drafts, upload PDFs, track status, withdraw
+- In-app notifications (bell) for every application step, message and report decision
+- Messages between applicants and staff on each application
+- Progress and budget reports for accepted teams, with spending lines and server-calculated totals
+- Badges (winner, finalist, participant, alumni, mentor, custom), XP levels and an opt-in public community leaderboard
 
 **Staff workspace**
 - Dashboard with portfolio, reach, funding and grant pipeline figures, adjusted to the user's role
 - Projects: create, edit, archive, link partners with roles, upload reports, mark as internal, CSV export, change history
-- Grant applications: review queue with status tabs, decisions with panel notes, applicant email notifications
+- Programmes with a drag-free form builder, profile pre-fill, capacity and dates; launch announcements to matching members
+- Application review queue, bulk decisions, scores, messages to applicants; reviewers never see gender or disability
+- Incubation board: progress reports, review with feedback, spending vs funding per programme
+- Members, badge awards, broadcasts, reports with anonymous inclusion figures and leaderboard
+- Reports for any period (presets or a custom from/to range) with a branded PDF export; you choose the sections and each export is audited
+- Legacy grant applications from the old system, still reviewable
 - News and posts: drafts, publish now or schedule; interns draft, officers publish
 - Publications and partner organisations management
 - Staff accounts with five roles, deactivation, password resets and a last-Hub-Director safeguard
@@ -65,7 +75,7 @@ npm run build
 php artisan serve
 ```
 
-Open http://localhost:8000 for the public site and http://localhost:8000/workspace/sign-in for the workspace.
+Open http://localhost:8000 for the public site and sign in at http://localhost:8000/sign-in.
 
 For live CSS/JS reloading run `npm run dev` in a second terminal. Queued emails are written to `storage/logs/laravel.log` (`MAIL_MAILER=log`); run `php artisan queue:work` to process them.
 
@@ -80,6 +90,8 @@ For live CSS/JS reloading run `npm run dev` in a second terminal. Queued emails 
 | reviewer@uew.edu.gh | Grant Reviewer |
 | intern@uew.edu.gh | Communications Intern |
 | viewer@uew.edu.gh | Read-only Staff |
+| member@uew.edu.gh | Member with applications, an accepted programme, badges, messages and a progress report |
+| newmember@uew.edu.gh | Member who has not finished onboarding |
 
 Demo data is for local use only. The seeder refuses to run in production unless `SEED_DEMO_DATA=true`. Real deployments create their first administrator with `php artisan hub:create-admin` (see [docs/deployment.md](docs/deployment.md)).
 
@@ -89,7 +101,9 @@ Demo data is for local use only. The seeder refuses to run in production unless 
 php artisan test
 ```
 
-101 feature and unit tests cover the public site, member sign-up with e-mail codes, onboarding, password reset, sign-in and lockout, the full role-by-page access matrix, project, content, publication, partner and user management, document access, the API, and security headers.
+125 feature and unit tests cover the public site, member sign-up with e-mail codes, onboarding, password reset, sign-in and lockout, the role-by-page access matrix, applications, notifications, messages, progress reports, badges and XP, the community page, profile pre-fill, content and user management, document access, the API and security headers. `RouteSmokeTest` requests every page as a guest and as every role and fails on any server error.
+
+CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs Pint, the asset build, a Blade compile check, the tests on SQLite and PostgreSQL, `composer audit`, `npm audit` and a Docker build on every push. Render deploys `main` automatically.
 
 ## Deploy
 
@@ -104,6 +118,9 @@ Step-by-step instructions, costs and limits are in [docs/deployment.md](docs/dep
 - [API reference](docs/api.md): endpoints, parameters, response format
 - [Deployment](docs/deployment.md): local, Render, Vercel, storage, mail, upgrades
 - [Security](docs/security.md): access control, data protection, hardening checklist
+- [Member guide](docs/guides/member-guide.md): sign-up, applying, reports, badges, troubleshooting
+- [Staff guide](docs/guides/staff-guide.md): roles, programmes, reviews, incubation board, administration, troubleshooting
+- [Stakeholder overview](docs/guides/stakeholder-overview.md): what the platform does, value, data protection, costs
 
 ## Repository layout
 

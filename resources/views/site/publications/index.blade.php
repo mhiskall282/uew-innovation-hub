@@ -1,11 +1,8 @@
 <x-layouts.site title="Publications" description="Research papers, policy briefs, newsletters and reports from the UEW Innovation Hub.">
-    <section class="border-b border-slate-200 bg-uew-canvas">
-        <div class="mx-auto max-w-7xl px-6 py-14">
-            <p class="text-xs font-bold tracking-widest text-uew-gold-dark uppercase">Library</p>
-            <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Publications</h1>
-            <p class="mt-3 max-w-2xl text-slate-600">Research papers, policy briefs, newsletters and reports from Hub projects. PDFs are free to read and share.</p>
-
-            <form method="GET" class="mt-8 flex flex-col gap-3 sm:flex-row" role="search">
+    <x-ui.page-hero eyebrow="Library" title="Publications" photo="creative-arts">
+        Research papers, policy briefs, newsletters and reports from Hub projects. PDFs are free to read and share.
+        <x-slot:below>
+            <form method="GET" class="flex max-w-3xl flex-col gap-3 text-slate-800 sm:flex-row" role="search">
                 @if ($activeType)<input type="hidden" name="type" value="{{ $activeType }}">@endif
                 <label class="relative flex-1">
                     <span class="sr-only">Search publications</span>
@@ -22,8 +19,8 @@
                     <a href="{{ route('site.publications.index', array_filter(['type' => $type, 'search' => $search])) }}" @class(['rounded-full px-3.5 py-1.5 text-xs font-semibold ring-1 ring-inset', 'bg-uew-navy text-white ring-uew-navy' => $activeType === $type, 'bg-white text-slate-600 ring-slate-300 hover:bg-slate-50' => $activeType !== $type])>{{ $type }}</a>
                 @endforeach
             </nav>
-        </div>
-    </section>
+        </x-slot:below>
+    </x-ui.page-hero>
 
     <section class="mx-auto max-w-5xl px-6 py-12">
         @if ($publications->isEmpty())

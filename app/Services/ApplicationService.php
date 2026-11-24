@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\AchievementType;
 use App\Enums\ApplicationStatus;
 use App\Enums\Permission;
 use App\Mail\TemplatedMail;
 use App\Models\Program;
 use App\Models\ProgramApplication;
 use App\Models\User;
+use App\Notifications\HubNotification;
+use App\Support\Demographics;
+use App\Support\FormSchema;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -27,6 +31,8 @@ final class ApplicationService
         private readonly DocumentStorage $documents,
         private readonly AuditLogger $audit,
         private readonly StaffNotifier $staff,
+        private readonly NotificationCenter $notifications,
+        private readonly EngagementService $engagement,
     ) {}
 
     /** The member's application for a programme, or a new unsaved draft. */
@@ -84,6 +90,7 @@ final class ApplicationService
             if ($submit) {
                 $application->status = ApplicationStatus::Submitted;
                 $application->submitted_at = now();
+                $application->applicant_snapshot = Demographics::snapshot($user);
             }
 
             $isNew = ! $application->exists;
@@ -99,6 +106,7 @@ final class ApplicationService
         });
 
         if ($submit) {
+            $this->engagement->addXp($user, EngagementService::XP_APPLICATION);
             $this->notifySubmitted($application, $program, $user);
         }
 
@@ -140,8 +148,25 @@ final class ApplicationService
 
         $this->audit->record('application.reviewed', "Set application {$application->reference} to \"{$status->label()}\"", $application, $changes);
 
-        if (($data['notify'] ?? false) && $previous !== $status) {
-            $this->notifyStatus($application);
+        if ($previous !== $status) {
+            $application->loadMissing('applicant', 'program');
+
+            // In-app notice always; e-mail only when the reviewer chose to send it.
+            $this->notifications->toUser($application->applicant, new HubNotification(
+                title: "{$application->program->title}: {$status->label()}",
+                body: $status->applicantMessage(),
+                url: route('portal.applications.show', $application),
+                icon: $status === ApplicationStatus::Approved ? 'check-circle' : 'inbox',
+                kind: 'application',
+            ));
+
+            if ($status === ApplicationStatus::Approved && $application->applicant) {
+                $this->engagement->award($application->applicant, AchievementType::Participant, $application->program, by: $reviewer);
+            }
+
+            if ($data['notify'] ?? false) {
+                $this->notifyStatus($application);
+            }
         }
 
         return $application;
@@ -200,7 +225,7 @@ final class ApplicationService
                         $a->reference, $a->status->label(), $a->applicant?->name, $a->applicant?->email, $a->applicant?->phone,
                         $a->applicant?->affiliation?->label(), $a->applicant?->institution,
                         $a->submitted_at?->format('Y-m-d H:i'), $a->score,
-                    ], $fields->map(fn ($f) => \App\Support\FormSchema::display($f, $a->answer($f['key'])))->all())));
+                    ], $fields->map(fn ($f) => FormSchema::display($f, $a->answer($f['key'])))->all())));
                 });
 
             fclose($out);
@@ -227,6 +252,21 @@ final class ApplicationService
 
     private function notifySubmitted(ProgramApplication $application, Program $program, User $user): void
     {
+        $this->notifications->toUser($user, new HubNotification(
+            title: 'Application submitted',
+            body: "We received your application to {$program->title} ({$application->reference}). +".EngagementService::XP_APPLICATION.' XP.',
+            url: route('portal.applications.show', $application),
+            icon: 'check-circle',
+            kind: 'application',
+        ));
+        $this->notifications->toStaff(Permission::ApplicationsReview, new HubNotification(
+            title: 'New application',
+            body: "{$user->name} applied to {$program->title}.",
+            url: route('workspace.applications.show', $application),
+            icon: 'inbox',
+            kind: 'application',
+        ), except: $user);
+
         $this->queue(fn () => Mail::to($user)->queue(new TemplatedMail('application_submitted', [
             'name' => $user->name, 'first_name' => $user->firstName(),
             'program' => $program->title, 'reference' => $application->reference,

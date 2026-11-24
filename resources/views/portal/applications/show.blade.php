@@ -42,6 +42,37 @@
                 @endif
             </x-ui.card>
 
+            @if ($application->canReportProgress())
+                <x-ui.card title="Progress & budget reports" description="Tell the Hub how your project is going and how the funds are being used." padding="p-0">
+                    <x-slot:actions>
+                        <x-ui.button :href="route('portal.reports.create', $application)" size="sm" icon="plus">New report</x-ui.button>
+                    </x-slot:actions>
+                    @if ($reports->isEmpty())
+                        <x-ui.empty title="No reports yet" icon="clipboard" class="py-10">Send your first report at the end of your first month, or when the Hub asks for one.</x-ui.empty>
+                    @else
+                        <ul class="divide-y divide-slate-100">
+                            @foreach ($reports as $report)
+                                <li class="flex flex-wrap items-center gap-4 px-5 py-3.5">
+                                    <div class="min-w-0 flex-1">
+                                        <a href="{{ route('portal.reports.show', $report) }}" class="font-semibold text-slate-900 hover:text-uew-royal">{{ $report->period }}</a>
+                                        <p class="text-xs text-slate-500"><span class="font-mono">{{ $report->reference }}</span> · spent GH₵ {{ number_format((float) $report->budget_spent, 2) }} of {{ number_format((float) $report->budget_received, 2) }}</p>
+                                    </div>
+                                    <x-ui.badge :tone="$report->status->tone()" dot>{{ $report->status->label() }}</x-ui.badge>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </x-ui.card>
+            @endif
+
+            @unless ($application->isEditable())
+                @include('partials.conversation', [
+                    'messages' => $application->messages,
+                    'action' => auth()->user()->can('message', $application) ? route('portal.applications.messages.store', $application) : null,
+                    'staffView' => false,
+                ])
+            @endunless
+
             <x-ui.card title="Your answers">
                 <dl class="divide-y divide-slate-100">
                     @foreach ($application->program->fields() as $field)

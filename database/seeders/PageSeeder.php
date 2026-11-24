@@ -16,7 +16,7 @@ class PageSeeder extends Seeder
         $email = config('hub.contact_email');
 
         $pages = [
-            ['about', 'About the Hub', 'How the UEW Innovation Hub supports research, teaching and enterprise.', 10, <<<MD
+            ['about', 'About the Hub', 'How the UEW Innovation Hub supports research, teaching and enterprise.', 10, <<<'MD'
 The **UEW Innovation Hub** is the University of Education, Winneba's home for turning research and ideas into projects that improve teaching, learning and communities across Ghana.
 
 ## What we do
@@ -34,7 +34,7 @@ Our programmes are open to UEW students, staff and alumni, and many welcome part
 
 [Create a free account](/sign-up) to apply for programmes and hear about new opportunities, or [contact us](/contact) to discuss a partnership.
 MD],
-            ['faq', 'Frequently asked questions', 'Accounts, applications and programmes.', 20, <<<MD
+            ['faq', 'Frequently asked questions', 'Accounts, applications and programmes.', 20, <<<'MD'
 ## Do I need an account to apply?
 
 Yes. A free account lets you save drafts, upload documents, follow the status of every application and receive updates. Sign-up takes a minute and we confirm your e-mail with a 6-digit code.
@@ -86,7 +86,7 @@ Account and application records are kept while your account is active and for th
 
 You can view and update your profile at any time, unsubscribe from announcements, and ask us to correct or delete your data by e-mailing [{$email}](mailto:{$email}).
 MD],
-            ['terms', 'Terms of use', 'The rules for using the UEW Innovation Hub website and accounts.', 40, <<<MD
+            ['terms', 'Terms of use', 'The rules for using the UEW Innovation Hub website and accounts.', 40, <<<'MD'
 By creating an account or using this website you agree to these terms.
 
 ## Your account

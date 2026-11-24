@@ -2,7 +2,10 @@
     @php
         $fields = $program->fields();
         $answers = $application->answers ?? [];
-        $valueFor = fn ($key) => old("answers.{$key}", $answers[$key] ?? null);
+        $member = auth()->user();
+        // Saved answer first, then the member's profile for questions linked to a profile value.
+        $valueFor = fn ($field) => old("answers.{$field['key']}", $answers[$field['key']]
+            ?? (! empty($field['prefill']) ? \App\Support\Demographics::prefillValue($member, $field['prefill'], $field['type']) : null));
         $inputClass = 'block w-full rounded-lg border bg-white px-3 py-2 text-sm text-slate-900 shadow-xs placeholder:text-slate-400 focus:border-uew-royal focus:ring-2 focus:ring-uew-royal/20 focus:outline-none';
         $maxMb = (int) floor(config('hub.max_upload_kb') / 1024);
     @endphp
@@ -33,7 +36,7 @@
                             $errorKey = $field['type'] === 'file' ? "files.{$key}" : "answers.{$key}";
                             $id = "q-{$key}";
                             $invalid = $errors->has($errorKey) || $errors->has("{$errorKey}.*");
-                            $value = $valueFor($key);
+                            $value = $field['type'] === 'file' ? null : $valueFor($field);
                             $border = $invalid ? 'border-red-400' : 'border-slate-300';
                         @endphp
                         <div class="rounded-xl border border-slate-100 bg-slate-50/40 p-4">
@@ -42,6 +45,9 @@
                                 <span>{{ $field['label'] }} @if ($field['required'])<span class="text-red-500">*</span>@endif</span>
                             </label>
                             @if ($field['help'])<p class="mt-1 ml-9 text-xs text-slate-500">{{ $field['help'] }}</p>@endif
+                            @if (! empty($field['prefill']) && ! array_key_exists($key, $answers) && filled($value))
+                                <p class="mt-1 ml-9 inline-flex items-center gap-1 text-[11px] font-semibold text-uew-royal"><x-ui.icon name="check-circle" class="size-3.5" /> Filled from your profile. You can change it here.</p>
+                            @endif
 
                             <div class="mt-3 ml-9">
                                 @switch($field['type'])

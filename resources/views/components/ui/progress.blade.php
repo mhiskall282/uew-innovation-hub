@@ -1,7 +1,7 @@
 @props(['value' => 0, 'tone' => 'royal', 'label' => null])
 @php
     $value = max(0, min(100, (int) $value));
-    $bars = ['royal' => 'from-uew-royal to-uew-purple', 'gold' => 'from-uew-gold to-uew-gold-light', 'green' => 'from-emerald-500 to-emerald-400'];
+    $bars = ['royal' => 'from-uew-royal to-uew-purple', 'gold' => 'from-uew-gold to-uew-gold-light', 'green' => 'from-emerald-500 to-emerald-400', 'red' => 'from-red-500 to-red-400'];
 @endphp
 <div {{ $attributes }}>
     @if ($label)

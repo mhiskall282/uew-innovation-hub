@@ -5,6 +5,7 @@
     $openGrants = $user->can('grants.review') ? $metrics->openGrantCount() : 0;
     $newMessages = $user->can('messages.manage') ? \App\Models\ContactMessage::newCount() : 0;
     $openApplications = $user->can('applications.review') ? $metrics->openApplicationCount() : 0;
+    $awaitingReports = $user->can('applications.review') ? \App\Models\ProgressReport::where('status', \App\Enums\ReportStatus::Submitted)->count() : 0;
 
     // Navigation is declared once; each item is hidden unless the user holds its permission.
     $groups = [
@@ -15,6 +16,7 @@
         'Programmes' => [
             ['label' => 'Programmes', 'icon' => 'sparkles', 'route' => 'workspace.programs.index', 'match' => 'workspace.programs.*', 'can' => 'programs.manage'],
             ['label' => 'Applications', 'icon' => 'inbox', 'route' => 'workspace.applications.index', 'match' => 'workspace.applications.*', 'can' => 'applications.review', 'badge' => $openApplications],
+            ['label' => 'Incubation board', 'icon' => 'clipboard', 'route' => 'workspace.progress-reports.index', 'match' => 'workspace.progress-reports.*', 'can' => 'applications.review', 'badge' => $awaitingReports],
             ['label' => 'Legacy grants', 'icon' => 'archive', 'route' => 'workspace.grants.index', 'match' => 'workspace.grants.*', 'can' => 'grants.review', 'badge' => $openGrants],
         ],
         'People' => [
@@ -72,7 +74,7 @@
 
         <div class="flex h-16 shrink-0 items-center gap-3 border-b border-white/5 px-4">
             <a href="{{ route('workspace.dashboard') }}" class="flex min-w-0 items-center gap-3">
-                <x-ui.crest class="size-9" />
+                <img src="{{ asset('images/uew/uew-logo.png') }}" alt="University of Education, Winneba" width="36" height="35" class="size-9 shrink-0 rounded-full bg-white p-0.5 ring-1 ring-uew-gold/40">
                 <span class="min-w-0 leading-tight" x-show="! collapsed" x-transition.opacity>
                     <span class="block truncate text-sm font-bold text-white">UEW Innovation Hub</span>
                     <span class="block truncate font-mono text-[10px] font-semibold tracking-widest text-uew-gold uppercase">Staff workspace</span>
@@ -149,10 +151,6 @@
             </button>
             <p class="min-w-0 truncate text-sm font-semibold text-slate-900">{{ $title }}</p>
             <div class="ml-auto flex items-center gap-2">
-                <span class="hidden items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-200 ring-inset md:inline-flex">
-                    <span class="size-1.5 animate-pulse rounded-full bg-emerald-500"></span>
-                    {{ app()->environment('production') ? 'Live' : ucfirst(app()->environment()) }}
-                </span>
                 <x-ui.button :href="route('site.home')" variant="ghost" size="sm" icon="globe" target="_blank" rel="noopener">
                     <span class="hidden sm:inline">Public site</span>
                 </x-ui.button>
@@ -161,6 +159,7 @@
                         <span class="hidden sm:inline">New project</span>
                     </x-ui.button>
                 @endcan
+                <x-ui.notification-bell :user="$user" />
 
                 {{-- Account menu --}}
                 <div class="relative" x-data="{ open: false }" @click.outside="open = false" @keydown.escape="open = false">

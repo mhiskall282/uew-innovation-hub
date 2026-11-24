@@ -1,11 +1,8 @@
 <x-layouts.site title="Projects" description="Research and innovation projects supported by the UEW Innovation Hub.">
-    <section class="border-b border-slate-200 bg-uew-canvas">
-        <div class="mx-auto max-w-7xl px-6 py-14">
-            <p class="text-xs font-bold tracking-widest text-uew-gold-dark uppercase">Portfolio</p>
-            <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Projects</h1>
-            <p class="mt-3 max-w-2xl text-slate-600">Projects led by UEW researchers with funding and support from the Innovation Hub and our partners.</p>
-
-            <form method="GET" action="{{ route('site.projects.index') }}" class="mt-8 grid gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-card sm:grid-cols-12" role="search">
+    <x-ui.page-hero eyebrow="Portfolio" title="Projects" photo="study-kiosk">
+        Projects led by UEW researchers with funding and support from the Innovation Hub and our partners.
+        <x-slot:below>
+            <form method="GET" action="{{ route('site.projects.index') }}" class="grid gap-3 rounded-2xl bg-white p-3 text-slate-800 shadow-card-hover sm:grid-cols-12" role="search">
                 <label class="relative sm:col-span-6">
                     <span class="sr-only">Search projects</span>
                     <x-ui.icon name="search" class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400" />
@@ -16,8 +13,8 @@
                 <x-ui.select name="status" :options="$statuses" :value="$filters['status'] ?? ''" placeholder="Any status" wrap="sm:col-span-2" aria-label="Status" />
                 <x-ui.button type="submit" class="sm:col-span-1">Filter</x-ui.button>
             </form>
-        </div>
-    </section>
+        </x-slot:below>
+    </x-ui.page-hero>
 
     <section class="mx-auto max-w-7xl px-6 py-12">
         @if (array_filter($filters))

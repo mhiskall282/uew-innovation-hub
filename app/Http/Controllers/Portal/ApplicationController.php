@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Program;
 use App\Models\ProgramApplication;
 use App\Services\ApplicationService;
+use App\Services\ConversationService;
 use App\Support\FormSchema;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -34,8 +35,14 @@ class ApplicationController extends Controller
     public function show(Request $request, ProgramApplication $application): View
     {
         Gate::authorize('view', $application);
+        abort_unless($application->user_id === $request->user()->id, 404);
 
-        return view('portal.applications.show', ['application' => $application->load('program')]);
+        app(ConversationService::class)->markRead($application, $request->user());
+
+        return view('portal.applications.show', [
+            'application' => $application->load('program', 'messages.author:id,name'),
+            'reports' => $application->canReportProgress() ? $application->progressReports()->get() : collect(),
+        ]);
     }
 
     /** Application form for an open programme (new or draft). */

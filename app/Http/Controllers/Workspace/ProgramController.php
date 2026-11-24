@@ -13,6 +13,7 @@ use App\Models\Program;
 use App\Models\ProgramApplication;
 use App\Services\ApplicationService;
 use App\Services\ProgramService;
+use App\Support\Demographics;
 use App\Support\FormSchema;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -147,6 +148,7 @@ class ProgramController extends Controller
             'focusAreas' => config('hub.focus_areas'),
             'fieldTypes' => FormSchema::TYPES,
             'withOptions' => FormSchema::WITH_OPTIONS,
+            'prefillSources' => Demographics::prefillSources(),
             'hasApplications' => $program->exists && $program->applications()->where('status', '!=', ApplicationStatus::Draft)->exists(),
         ];
     }

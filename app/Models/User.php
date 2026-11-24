@@ -8,6 +8,7 @@ use App\Enums\Affiliation;
 use App\Enums\Permission;
 use App\Enums\Role;
 use App\Models\Concerns\Searchable;
+use App\Services\EngagementService;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -37,11 +38,17 @@ class User extends Authenticatable
         'department',
         'password',
         'phone',
+        'gender',
+        'date_of_birth',
+        'region',
         'affiliation',
         'institution',
+        'education_level',
+        'disability',
         'bio',
         'interests',
         'marketing_opt_in',
+        'public_profile',
     ];
 
     protected $hidden = [
@@ -53,6 +60,8 @@ class User extends Authenticatable
         'role' => 'viewer',
         'is_active' => true,
         'marketing_opt_in' => false,
+        'xp' => 0,
+        'public_profile' => false,
     ];
 
     protected function casts(): array
@@ -65,6 +74,9 @@ class User extends Authenticatable
             'notify_contact_messages' => 'boolean',
             'marketing_opt_in' => 'boolean',
             'interests' => 'array',
+            'xp' => 'integer',
+            'public_profile' => 'boolean',
+            'date_of_birth' => 'date',
             'email_verified_at' => 'datetime',
             'onboarded_at' => 'datetime',
             'last_login_at' => 'datetime',
@@ -90,6 +102,27 @@ class User extends Authenticatable
     public function applications(): HasMany
     {
         return $this->hasMany(ProgramApplication::class);
+    }
+
+    public function achievements(): HasMany
+    {
+        return $this->hasMany(Achievement::class)->latest('awarded_at');
+    }
+
+    public function progressReports(): HasMany
+    {
+        return $this->hasMany(ProgressReport::class);
+    }
+
+    /** Level name and progress towards the next level, from XP. */
+    public function level(): array
+    {
+        return EngagementService::level((int) $this->xp);
+    }
+
+    public function scopeOnLeaderboard(Builder $query): Builder
+    {
+        return $query->members()->active()->where('public_profile', true)->where('xp', '>', 0);
     }
 
     public function hasPermission(Permission $permission): bool
@@ -143,12 +176,18 @@ class User extends Authenticatable
             ->join('') ?: 'U';
     }
 
+    public function age(): ?int
+    {
+        return $this->date_of_birth?->age;
+    }
+
     /** Profile fields filled in, for the portal completeness meter. */
     public function profileCompleteness(): int
     {
         $checks = [
-            filled($this->name), filled($this->phone), $this->affiliation !== null,
-            filled($this->institution), filled($this->bio), ! empty($this->interests), $this->hasVerifiedEmail(),
+            filled($this->name), filled($this->phone), filled($this->gender), $this->date_of_birth !== null,
+            filled($this->region), $this->affiliation !== null, filled($this->institution),
+            filled($this->education_level), filled($this->bio), ! empty($this->interests), $this->hasVerifiedEmail(),
         ];
 
         return (int) round(count(array_filter($checks)) / count($checks) * 100);

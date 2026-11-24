@@ -3,9 +3,9 @@
         <div class="mx-auto max-w-3xl px-6 py-12">
             <div class="text-center">
                 <span class="mx-auto flex size-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 ring-8 ring-emerald-50/50"><x-ui.icon name="check-circle" class="size-7" /></span>
-                <p class="mt-5 text-xs font-bold tracking-widest text-uew-gold-dark uppercase">Step 2 of 2</p>
+                <p class="mt-5 text-xs font-bold tracking-widest text-uew-gold-dark uppercase">Step 3 of 3 · Your background</p>
                 <h1 class="mt-1 text-3xl font-extrabold tracking-tight text-slate-900">Welcome, {{ $user->firstName() }}</h1>
-                <p class="mx-auto mt-2 max-w-xl text-slate-600">Your e-mail is verified. Tell us a little about yourself so we can show you the right opportunities.</p>
+                <p class="mx-auto mt-2 max-w-xl text-slate-600">Your e-mail is verified. Tell us about your background and interests so we can recommend the right opportunities and fill in your applications for you.</p>
             </div>
 
             <ol class="mx-auto mt-8 flex max-w-md items-center justify-center gap-3 text-xs font-semibold" aria-label="Progress">

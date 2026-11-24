@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\ApplicationStatus;
 use App\Enums\GrantStatus;
 use App\Models\GrantApplication;
 use App\Models\Organization;
+use App\Models\ProgramApplication;
 use App\Models\Project;
 use App\Models\Publication;
 use Illuminate\Support\Facades\Cache;
@@ -149,8 +151,8 @@ final class MetricsService
     /** Programme applications waiting for a decision (cached briefly). */
     public function openApplicationCount(): int
     {
-        return (int) Cache::remember('hub.metrics.open_applications', 60, fn () => \App\Models\ProgramApplication::query()
-            ->whereIn('status', \App\Enums\ApplicationStatus::open())
+        return (int) Cache::remember('hub.metrics.open_applications', 60, fn () => ProgramApplication::query()
+            ->whereIn('status', ApplicationStatus::open())
             ->count());
     }
 

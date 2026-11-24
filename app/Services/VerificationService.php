@@ -64,17 +64,14 @@ final class VerificationService
 
         $template = $purpose === VerificationCode::RESET_PASSWORD ? 'password_reset_code' : 'verification_code';
 
+        // The code is only ever delivered by e-mail. It is never shown on screen,
+        // stored in the session, or written to logs by the application.
         Mail::to($user)->send(new TemplatedMail($template, [
             'name' => $user->name,
             'first_name' => $user->firstName(),
             'code' => $code,
             'minutes' => self::EXPIRY_MINUTES,
         ]));
-
-        // Local development convenience only: show the code when mail is only being logged.
-        if (app()->isLocal() && config('mail.default') === 'log') {
-            session()->flash('dev_code', $code);
-        }
     }
 
     /**

@@ -1,4 +1,4 @@
-@props(['title' => 'Sign in'])
+@props(['title' => 'Sign in', 'wide' => false])
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
 <head>
@@ -12,11 +12,14 @@
 <body class="h-full bg-uew-canvas font-sans text-slate-800 antialiased">
 <div class="flex min-h-full">
     {{-- Brand panel --}}
-    <div class="relative hidden w-[44%] flex-col justify-between overflow-hidden bg-uew-ink p-12 text-white lg:flex">
-        <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(49,87,213,0.35),transparent_55%),radial-gradient(circle_at_85%_85%,rgba(109,40,217,0.3),transparent_50%)]"></div>
-        <div class="pointer-events-none absolute inset-0 opacity-[0.07] [background-image:radial-gradient(#fbbf24_1px,transparent_1px)] [background-size:22px_22px]"></div>
+    <div class="relative isolate hidden w-[44%] flex-col justify-between overflow-hidden bg-uew-ink p-12 text-white lg:flex">
+        <img src="{{ asset('images/uew/campus-north.jpg') }}" alt="" aria-hidden="true" class="absolute inset-0 -z-20 size-full object-cover opacity-50">
+        <div class="absolute inset-0 -z-10 bg-gradient-to-b from-uew-ink/95 via-uew-ink/80 to-uew-navy/90"></div>
+        <div class="absolute inset-y-0 right-0 -z-10 w-1 bg-gradient-to-b from-uew-gold via-uew-gold-light to-uew-red"></div>
 
         <a href="{{ route('site.home') }}" class="relative flex items-center gap-3">
+            <img src="{{ asset('images/uew/uew-logo.png') }}" alt="University of Education, Winneba crest" width="48" height="47" class="size-12 rounded-full bg-white p-0.5">
+            <span class="h-10 w-px bg-white/20" aria-hidden="true"></span>
             <x-ui.crest class="size-12" />
             <div>
                 <p class="text-lg font-bold">UEW Innovation Hub</p>
@@ -40,8 +43,8 @@
     </div>
 
     {{-- Form panel --}}
-    <div class="flex flex-1 items-center justify-center px-6 py-12">
-        <div class="w-full max-w-sm">
+    <div class="flex flex-1 items-center justify-center px-5 py-10 sm:px-8">
+        <div @class(['w-full', 'max-w-xl' => $wide, 'max-w-sm' => ! $wide])>
             <a href="{{ route('site.home') }}" class="mb-8 flex items-center gap-3 lg:hidden">
                 <x-ui.crest class="size-11" />
                 <div>

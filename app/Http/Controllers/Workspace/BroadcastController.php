@@ -11,6 +11,7 @@ use App\Http\Requests\Portal\ProfileRequest;
 use App\Mail\TemplatedMail;
 use App\Models\Broadcast;
 use App\Services\BroadcastService;
+use App\Support\Format;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -34,7 +35,7 @@ class BroadcastController extends Controller
     {
         return view('workspace.broadcasts.create', $this->formData(new Broadcast([
             'subject' => '',
-            'body' => 'Hello '.\App\Support\Format::placeholder('first_name').",\n\n",
+            'body' => 'Hello '.Format::placeholder('first_name').",\n\n",
             'audience' => ['interests' => [], 'affiliations' => []],
         ])));
     }

@@ -77,6 +77,11 @@ final class FormSchema
                 }
             }
 
+            $prefill = (string) ($field['prefill'] ?? '');
+            if ($type === 'file' || ! array_key_exists($prefill, Demographics::prefillSources())) {
+                $prefill = null;
+            }
+
             $clean[] = [
                 'key' => $key,
                 'label' => Str::limit($label, 200, ''),
@@ -84,6 +89,7 @@ final class FormSchema
                 'required' => filter_var($field['required'] ?? false, FILTER_VALIDATE_BOOL),
                 'help' => ($help = trim((string) ($field['help'] ?? ''))) !== '' ? Str::limit($help, 300, '') : null,
                 'options' => $options,
+                'prefill' => $prefill,
             ];
         }
 

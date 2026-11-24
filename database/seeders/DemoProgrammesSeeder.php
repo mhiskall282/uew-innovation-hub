@@ -2,13 +2,20 @@
 
 namespace Database\Seeders;
 
+use App\Enums\AchievementType;
 use App\Enums\ApplicationStatus;
 use App\Enums\ProgramStatus;
 use App\Enums\ProgramType;
+use App\Enums\ReportStatus;
 use App\Enums\Role;
+use App\Models\Achievement;
+use App\Models\ApplicationMessage;
 use App\Models\Program;
 use App\Models\ProgramApplication;
+use App\Models\ProgressReport;
 use App\Models\User;
+use App\Services\EngagementService;
+use App\Support\Demographics;
 use App\Support\FormSchema;
 use Illuminate\Database\Seeder;
 
@@ -91,9 +98,12 @@ class DemoProgrammesSeeder extends Seeder
         $member = $this->member('member@uew.edu.gh', 'Abena Sarpong', [
             'phone' => '+233 24 555 0199', 'affiliation' => 'student', 'institution' => 'University of Education, Winneba',
             'department' => 'BSc Information Technology Education', 'bio' => 'Final-year student building offline maths games for basic schools.',
+            'gender' => 'female', 'date_of_birth' => '2003-04-12', 'region' => 'Central', 'education_level' => 'undergraduate', 'disability' => 'no',
             'interests' => ['Educational Tech', 'STEM', 'Fellowships', 'Events'], 'marketing_opt_in' => true, 'onboarded_at' => now()->subDays(20),
         ]);
-        $this->member('newmember@uew.edu.gh', 'Yaw Boateng', ['onboarded_at' => null]);
+        $this->member('newmember@uew.edu.gh', 'Yaw Boateng', [
+            'onboarded_at' => null, 'phone' => '+233 24 555 0288', 'gender' => 'male', 'date_of_birth' => '2004-02-17', 'region' => 'Greater Accra',
+        ]);
 
         $fellowship = $created[0];
         $bootcamp = $created[2];
@@ -114,13 +124,59 @@ class DemoProgrammesSeeder extends Seeder
             $user = $this->member($email, $name, [
                 'phone' => '+233 20 555 01'.$i.'0', 'affiliation' => $i === 2 ? 'alumni' : 'student', 'institution' => 'University of Education, Winneba',
                 'interests' => ['Educational Tech', 'Agriculture'], 'marketing_opt_in' => $i !== 1, 'onboarded_at' => now()->subDays(10 - $i),
+                'gender' => ['male', 'female', 'male'][$i], 'date_of_birth' => ['2001-09-03', '1999-01-21', '1995-06-30'][$i],
+                'region' => ['Central', 'Volta', 'Ashanti'][$i], 'education_level' => ['undergraduate', 'undergraduate', 'masters'][$i], 'disability' => 'no',
             ]);
             $this->application($fellowship, $user, [ApplicationStatus::Submitted, ApplicationStatus::Shortlisted, ApplicationStatus::Submitted][$i], [
                 'team_name' => ['Read Along', 'FarmSense', 'EduSign'][$i],
                 'problem' => 'A practical solution for Ghanaian classrooms, tested with teachers in Winneba.',
                 'stage' => 'Idea only', 'team_size' => (string) ($i + 2),
             ]);
+            $user->forceFill(['public_profile' => $i !== 1, 'xp' => max((int) $user->xp, 10 + $i * 40)])->save();
         }
+
+        $this->engagement($member, $closed);
+    }
+
+    /** Badges, XP, a conversation and a progress report for the demo member. */
+    private function engagement(User $member, Program $closed): void
+    {
+        $application = ProgramApplication::where('program_id', $closed->id)->where('user_id', $member->id)->first();
+        $staff = User::where('email', 'officer@uew.edu.gh')->first() ?? User::where('email', 'admin@uew.edu.gh')->first();
+
+        foreach ([[AchievementType::Participant, null], [AchievementType::Finalist, 'Second place, Pitch Day']] as [$type, $note]) {
+            Achievement::firstOrNew(['user_id' => $member->id, 'program_id' => $closed->id, 'type' => $type])->forceFill([
+                'title' => EngagementService::defaultTitle($type, $closed),
+                'description' => $note, 'xp' => $type->xp(), 'awarded_by' => $staff?->id, 'awarded_at' => now()->subDays(1),
+            ])->save();
+        }
+        $member->forceFill(['public_profile' => true, 'xp' => 20 + Achievement::where('user_id', $member->id)->sum('xp')])->save();
+
+        if (! $application || ApplicationMessage::where('program_application_id', $application->id)->exists()) {
+            return;
+        }
+
+        foreach ([[$staff, true, 'Congratulations again! Please send your first progress report with a simple budget breakdown by the end of the month.'],
+            [$member, false, 'Thank you! We have bought the filter materials and will report once the school pilot starts.']] as [$author, $fromStaff, $body]) {
+            (new ApplicationMessage)->forceFill([
+                'program_application_id' => $application->id, 'user_id' => $author?->id, 'from_staff' => $fromStaff, 'body' => $body,
+            ])->save();
+        }
+
+        (new ProgressReport)->forceFill([
+            'program_application_id' => $application->id, 'user_id' => $member->id,
+            'period' => 'Month 1', 'period_end' => now()->subDays(3)->toDateString(),
+            'summary' => 'Built three SandFilter+ units and trained two teachers at Winneba Basic School to maintain them.',
+            'milestones' => "Prototype finalised\nPilot school agreed\nTurbidity indicator tested",
+            'challenges' => 'Sand supplier delays added a week.', 'next_steps' => 'Start daily water-quality logging with pupils.',
+            'beneficiaries' => 240, 'budget_received' => 5000, 'budget_spent' => 3150,
+            'line_items' => [
+                ['category' => 'Equipment & materials', 'description' => 'Filter housings and sand', 'budgeted' => 2500, 'spent' => 2300],
+                ['category' => 'Travel & transport', 'description' => 'Transport to pilot school', 'budgeted' => 600, 'spent' => 450],
+                ['category' => 'Training & workshops', 'description' => 'Teacher training session', 'budgeted' => 500, 'spent' => 400],
+            ],
+            'status' => ReportStatus::Submitted,
+        ])->save();
     }
 
     private function member(string $email, string $name, array $profile): User
@@ -143,6 +199,7 @@ class DemoProgrammesSeeder extends Seeder
             'decision_message' => $message,
             'submitted_at' => $status === ApplicationStatus::Draft ? null : ($application->submitted_at ?? now()->subDays(4)),
             'decided_at' => $status->isFinal() ? now()->subDays(1) : null,
+            'applicant_snapshot' => $status === ApplicationStatus::Draft ? null : Demographics::snapshot($user),
         ])->save();
     }
 }

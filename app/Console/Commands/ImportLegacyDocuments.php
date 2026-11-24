@@ -30,7 +30,7 @@ class ImportLegacyDocuments extends Command
         $skipped = 0;
 
         foreach ([DocumentStorage::REPORTS, DocumentStorage::PUBLICATIONS] as $folder) {
-            $directory = $source . DIRECTORY_SEPARATOR . $folder;
+            $directory = $source.DIRECTORY_SEPARATOR.$folder;
 
             if (! File::isDirectory($directory)) {
                 continue;
@@ -41,7 +41,7 @@ class ImportLegacyDocuments extends Command
                     continue;
                 }
 
-                $target = $folder . '/' . $file->getFilename();
+                $target = $folder.'/'.$file->getFilename();
 
                 if ($disk->exists($target)) {
                     $skipped++;

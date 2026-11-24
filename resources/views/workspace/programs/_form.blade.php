@@ -4,11 +4,14 @@
     $fields = old('fields', collect($program->fields())->map(fn ($f) => [
         'key' => $f['key'], 'label' => $f['label'], 'type' => $f['type'],
         'required' => $f['required'], 'help' => $f['help'], 'options' => implode("\n", $f['options'] ?? []),
+        'prefill' => $f['prefill'] ?? '',
     ])->all());
     $fields = array_values(array_map(fn ($f) => [
         'key' => $f['key'] ?? '', 'label' => $f['label'] ?? '', 'type' => $f['type'] ?? 'short_text',
         'required' => filter_var($f['required'] ?? false, FILTER_VALIDATE_BOOL), 'help' => $f['help'] ?? '', 'options' => $f['options'] ?? '',
+        'prefill' => $f['prefill'] ?? '',
     ], $fields));
+    $prefillSources ??= \App\Support\Demographics::prefillSources();
     $dt = fn ($value) => $value?->format('Y-m-d\TH:i');
 @endphp
 
@@ -35,7 +38,7 @@
             <div x-data="{
                     fields: @js($fields),
                     withOptions: @js($withOptions),
-                    add(type = 'short_text') { this.fields.push({ key: '', label: '', type, required: false, help: '', options: '' }); this.$nextTick(() => this.$refs.list.lastElementChild?.querySelector('input')?.focus()); },
+                    add(type = 'short_text') { this.fields.push({ key: '', label: '', type, required: false, help: '', options: '', prefill: '' }); this.$nextTick(() => this.$refs.list.lastElementChild?.querySelector('input')?.focus()); },
                     remove(i) { this.fields.splice(i, 1); },
                     move(i, d) { const j = i + d; if (j < 0 || j >= this.fields.length) return; [this.fields[i], this.fields[j]] = [this.fields[j], this.fields[i]]; },
                 }">
@@ -63,6 +66,15 @@
                                         <span class="sr-only">Help text</span>
                                         <input type="text" :name="`fields[${i}][help]`" x-model="field.help" maxlength="300" placeholder="Help text shown under the question (optional)"
                                                class="block w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-600 focus:border-uew-royal focus:outline-none">
+                                    </label>
+                                    <label class="sm:col-span-12" x-show="field.type !== 'file'">
+                                        <span class="text-xs font-semibold text-slate-600">Pre-fill from the applicant's profile</span>
+                                        <select :name="`fields[${i}][prefill]`" x-model="field.prefill" class="mt-1 block w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs focus:border-uew-royal focus:outline-none sm:max-w-xs">
+                                            <option value="">Don't pre-fill</option>
+                                            @foreach ($prefillSources as $value => $label)
+                                                <option value="{{ $value }}">{{ $label }}</option>
+                                            @endforeach
+                                        </select>
                                     </label>
                                     <label class="sm:col-span-12" x-show="withOptions.includes(field.type)">
                                         <span class="text-xs font-semibold text-slate-600">Choices, one per line</span>

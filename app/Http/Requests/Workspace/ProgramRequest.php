@@ -6,6 +6,7 @@ namespace App\Http\Requests\Workspace;
 
 use App\Enums\ProgramStatus;
 use App\Enums\ProgramType;
+use App\Support\Demographics;
 use App\Support\FormSchema;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -51,6 +52,7 @@ class ProgramRequest extends FormRequest
             'fields.*.required' => ['nullable'],
             'fields.*.help' => ['nullable', 'string', 'max:300'],
             'fields.*.options' => ['nullable', 'string', 'max:5000'],
+            'fields.*.prefill' => ['nullable', Rule::in(array_keys(Demographics::prefillSources()))],
         ];
     }
 

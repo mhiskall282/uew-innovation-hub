@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\Route;
 | Public REST API, version 1
 |--------------------------------------------------------------------------
 | Read-only access to public data: impact statistics, projects, publications,
-| news and partners. Rate limited to 60 requests per minute per IP.
+| news, partners, programmes and the opt-in community leaderboard.
+| Rate limited to 60 requests per minute per IP.
 | Documented in docs/api.md and docs/api/openapi.yaml.
 */
 
@@ -26,4 +27,9 @@ Route::prefix('v1')->middleware('throttle:api')->name('api.v1.')->group(function
     Route::get('/news/{post}', [V1\NewsController::class, 'show'])->name('news.show');
 
     Route::get('/partners', [V1\PartnerController::class, 'index'])->name('partners.index');
+
+    Route::get('/programmes', [V1\ProgramController::class, 'index'])->name('programmes.index');
+    Route::get('/programmes/{program}', [V1\ProgramController::class, 'show'])->name('programmes.show');
+
+    Route::get('/community', V1\CommunityController::class)->name('community');
 });

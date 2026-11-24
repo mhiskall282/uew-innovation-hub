@@ -35,14 +35,45 @@
             @if ($member->bio)
                 <x-ui.card title="Bio"><p class="text-sm whitespace-pre-line text-slate-700">{{ $member->bio }}</p></x-ui.card>
             @endif
+
+            @php $level = $member->level(); @endphp
+            <x-ui.card title="Badges & XP" :description="$level['name'] . ' · ' . number_format($member->xp) . ' XP' . ($member->public_profile ? ' · on the public community page' : ' · profile is private')" padding="p-0">
+                @if ($achievements->isEmpty())
+                    <x-ui.empty title="No badges yet" icon="trophy" class="py-10">Accepted applications earn a badge automatically. Award winners, finalists, alumni and mentors here.</x-ui.empty>
+                @else
+                    <ul class="divide-y divide-slate-100">
+                        @foreach ($achievements as $achievement)
+                            <li class="flex flex-wrap items-center gap-4 px-5 py-3.5">
+                                <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-amber-50 text-uew-gold-dark ring-1 ring-amber-200"><x-ui.icon :name="$achievement->type->icon()" class="size-5" /></span>
+                                <div class="min-w-0 flex-1">
+                                    <p class="font-semibold text-slate-900">{{ $achievement->title }}</p>
+                                    <p class="text-xs text-slate-500">
+                                        <x-ui.badge :tone="$achievement->type->tone()" size="xs">{{ $achievement->type->label() }}</x-ui.badge>
+                                        +{{ $achievement->xp }} XP · {{ $achievement->awarded_at->format('j M Y') }}{{ $achievement->awarder ? ' · by ' . $achievement->awarder->name : ' · automatic' }}
+                                    </p>
+                                    @if ($achievement->description)<p class="mt-1 text-xs text-slate-600">{{ $achievement->description }}</p>@endif
+                                </div>
+                                <x-ui.confirm-form :action="route('workspace.achievements.destroy', $achievement)" :message="'Remove the badge “' . $achievement->title . '” and take back its XP?'" label="Remove" size="xs" />
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+            </x-ui.card>
         </div>
 
         <div class="space-y-6">
+            <x-ui.card title="Award a badge">
+                @include('workspace.members._award-form', ['types' => $achievementTypes, 'programs' => $programs])
+            </x-ui.card>
             <x-ui.card title="Profile">
                 <dl class="space-y-3 text-sm">
                     @foreach ([
                         'Phone' => $member->phone, 'Affiliation' => $member->affiliation?->label(), 'Institution' => $member->institution,
-                        'Department' => $member->department, 'Verified' => $member->email_verified_at?->format('j M Y') ?? 'No',
+                        'Department' => $member->department,
+                        'Education' => \App\Support\Demographics::EDUCATION_LEVELS[$member->education_level ?? ''] ?? null,
+                        'Gender' => \App\Support\Demographics::GENDERS[$member->gender ?? ''] ?? null,
+                        'Age' => $member->age(), 'Region' => $member->region,
+                        'Disability' => \App\Support\Demographics::DISABILITY[$member->disability ?? ''] ?? null, 'Verified' => $member->email_verified_at?->format('j M Y') ?? 'No',
                         'Profile completed' => $member->onboarded_at?->format('j M Y') ?? 'No', 'Announcements' => $member->marketing_opt_in ? 'Subscribed' : 'Off',
                         'Last sign-in' => $member->last_login_at?->diffForHumans() ?? 'Never', 'Joined' => $member->created_at->format('j M Y'),
                     ] as $label => $value)

@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Workspace;
 
+use App\Enums\AchievementType;
 use App\Enums\ApplicationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\Program;
 use App\Models\ProgramApplication;
 use App\Services\ApplicationService;
+use App\Services\ConversationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -43,11 +45,16 @@ class ApplicationController extends Controller
     {
         Gate::authorize('view', $application);
 
-        $application->load(['program', 'applicant', 'reviewer:id,name']);
+        $application->load(['program', 'applicant', 'reviewer:id,name', 'messages.author:id,name', 'progressReports']);
+
+        if ($application->user_id !== request()->user()->id) {
+            app(ConversationService::class)->markRead($application, request()->user());
+        }
 
         return view('workspace.applications.show', [
             'application' => $application,
             'statuses' => ApplicationStatus::reviewable(),
+            'achievementTypes' => AchievementType::options(),
             'history' => ActivityLog::query()
                 ->with('user:id,name')
                 ->where('subject_type', $application->getMorphClass())

@@ -68,3 +68,23 @@ The CSP allows `'unsafe-eval'` for Alpine.js expressions and `'unsafe-inline'` s
 - The `legacy/` folder in this repository contains the old system's hard-coded local database credentials (`root` / `mysql`). It is not deployed, but because the repository is public, treat those credentials as compromised: change them on any machine still running the legacy MySQL server.
 - There is no self-service password reset by email; the Hub Director resets passwords from the workspace. Add Laravel's password broker if staff need self-service resets.
 - Two-factor authentication is not implemented yet.
+
+## Engagement features (notifications, messages, reports, badges)
+
+| Risk | Control |
+| --- | --- |
+| Reading another member's notifications | Notifications are always loaded through the signed-in user's own relation; other IDs return 404. |
+| Open redirect via notification links | Links are stored as relative paths. The redirect only follows paths starting with a single `/` with no backslashes or control characters. |
+| Reading or posting in someone else's application thread | `ProgramApplicationPolicy::message` allows only the applicant or staff with `applications.review`, and never on drafts. |
+| Viewing or editing another member's progress report | `ProgressReportPolicy` limits viewing to the author and reviewers, and editing to the author while changes are requested. The portal also returns 404 for reports that aren't yours. |
+| Inflated budget totals | `budget_spent` is recomputed on the server from the line items; posted totals are ignored. Categories are whitelisted. |
+| XP or badge tampering | Only staff with `members.manage` award badges; standard badges have fixed XP, duplicates are ignored, and every award or removal is audited. |
+| Leaking personal data on the community page or API | Opt-in only (`public_profile`), and only name, affiliation, institution, bio, XP and badges are exposed. |
+| Reviewer bias | Reviewers see the applicant snapshot without gender or disability. Demographics appear only as totals on Reports. |
+| Message flooding | Message and report submissions are rate limited per user. |
+
+## Verified against the live site
+
+A black-box check of the deployment confirmed: HSTS, CSP, `X-Content-Type-Options`, `X-Frame-Options` and `Referrer-Policy` headers; `Secure`, `HttpOnly`, `SameSite=Lax` session cookies; `.env` and `.git` blocked; no framework debug endpoints; protected pages redirect to sign-in; form posts without a CSRF token are rejected with 419; oversized API page sizes are rejected with 422.
+
+Known trade-off: the CSP allows `'unsafe-eval'` because Alpine.js evaluates its inline expressions. Moving to Alpine's CSP build would remove this but requires rewriting every inline expression as a registered component.

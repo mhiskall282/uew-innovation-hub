@@ -23,8 +23,9 @@ RUN composer install --no-dev --no-interaction --no-scripts --no-autoloader --pr
 FROM php:8.4-apache
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libpq-dev libzip-dev libicu-dev unzip curl \
-    && docker-php-ext-install -j"$(nproc)" pdo_pgsql pdo_mysql zip intl bcmath opcache \
+    && apt-get install -y --no-install-recommends libpq-dev libzip-dev libicu-dev libpng-dev libjpeg62-turbo-dev libfreetype6-dev unzip curl \
+    && docker-php-ext-configure gd --with-jpeg --with-freetype \
+    && docker-php-ext-install -j"$(nproc)" pdo_pgsql pdo_mysql zip intl bcmath opcache gd \
     && rm -rf /var/lib/apt/lists/*
 
 # Apache: serve public/, enable rewrites and headers, hide version details.

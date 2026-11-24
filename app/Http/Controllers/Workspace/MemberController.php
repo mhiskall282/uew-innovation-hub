@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Workspace;
 
+use App\Enums\AchievementType;
 use App\Enums\Affiliation;
 use App\Enums\ApplicationStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Portal\ProfileRequest;
+use App\Models\Program;
 use App\Models\User;
 use App\Services\ApplicationService;
 use App\Services\UserService;
+use App\Support\Demographics;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -46,6 +49,9 @@ class MemberController extends Controller
         return view('workspace.members.show', [
             'member' => $member,
             'applications' => $member->applications()->with('program:id,title,slug')->latest()->get(),
+            'achievements' => $member->achievements()->with('program:id,title,slug', 'awarder:id,name')->get(),
+            'achievementTypes' => AchievementType::options(),
+            'programs' => Program::query()->whereIn('id', $member->applications()->select('program_id'))->orderBy('title')->pluck('title', 'id')->all(),
         ]);
     }
 
@@ -65,10 +71,13 @@ class MemberController extends Controller
         return response()->streamDownload(function () use ($query) {
             $out = fopen('php://output', 'w');
             fwrite($out, "\xEF\xBB\xBF");
-            fputcsv($out, ['Name', 'Email', 'Phone', 'Affiliation', 'Institution', 'Department', 'Interests', 'Announcements', 'Verified', 'Joined']);
+            fputcsv($out, ['Name', 'Email', 'Phone', 'Gender', 'Age', 'Region', 'Education', 'Affiliation', 'Institution', 'Department', 'Interests', 'Announcements', 'Verified', 'Joined']);
 
             $query->lazy(500)->each(fn (User $u) => fputcsv($out, array_map([ApplicationService::class, 'cell'], [
-                $u->name, $u->email, $u->phone, $u->affiliation?->label(), $u->institution, $u->department,
+                $u->name, $u->email, $u->phone,
+                Demographics::GENDERS[$u->gender ?? ''] ?? '', $u->age(), $u->region,
+                Demographics::EDUCATION_LEVELS[$u->education_level ?? ''] ?? '',
+                $u->affiliation?->label(), $u->institution, $u->department,
                 implode('; ', $u->interests ?? []), $u->marketing_opt_in ? 'Yes' : 'No',
                 $u->email_verified_at ? 'Yes' : 'No', $u->created_at?->format('Y-m-d'),
             ])));

@@ -112,12 +112,44 @@ Same fields plus `content` (Markdown source).
 
 Fields: `id`, `name`, `type`, `website`, `public_projects`.
 
+### `GET /api/v1/programmes`
+
+Published and closed programmes. Drafts and archived programmes are never returned, and neither are application forms or anything about applicants.
+
+| Parameter | Values |
+| --- | --- |
+| `availability` | `open`, `upcoming`, `closed` (default: all visible) |
+| `type` | `grant`, `fellowship`, `incubation`, `competition`, `training`, `event` |
+| `focus_area` | One of the six focus areas, e.g. `STEM` |
+| `search` | Title or summary text, up to 100 characters |
+| `per_page` | 1 to 50 (default 15) |
+
+Fields: `slug`, `title`, `type`, `type_label`, `focus_area`, `summary`, `availability`, `is_accepting_applications`, `is_featured`, `funding_amount`, `currency` (`GHS`), `location`, `opens_at`, `closes_at`, `starts_at`, `url`, `apply_url`.
+
+### `GET /api/v1/programmes/{slug}`
+
+Same fields plus `description` and `eligibility` (Markdown). Returns 404 for drafts and archived programmes.
+
+### `GET /api/v1/community`
+
+The top 25 members by XP who chose to appear on the public community page. Fields: `rank`, `name`, `affiliation`, `xp`, `level`, `badges` (`type`, `title`, `awarded_at`), `profile_url`. E-mail addresses, phone numbers and demographic data are never included.
+
+## Security
+
+- The API is read-only (`GET` only) and serves only data that is already public on the website.
+- Requests are rate limited to 60 per minute per IP address. Over the limit you get `429` with a `Retry-After` header.
+- Inputs are validated. Invalid filters return `422` with an `errors` object; nothing is passed to the database unchecked.
+- Responses are cacheable for 60 seconds (`Cache-Control: public, max-age=60`).
+- No API keys are needed, and none should be embedded in client code. If a future endpoint needs authentication it will use Laravel Sanctum tokens under `/api/v2`.
+
 ## Examples
 
 ```bash
 curl https://<domain>/api/v1/stats
 curl "https://<domain>/api/v1/projects?focus_area=Agriculture&per_page=5"
 curl "https://<domain>/api/v1/news?type=announcement"
+curl "https://<domain>/api/v1/programmes?availability=open&type=incubation"
+curl https://<domain>/api/v1/community
 ```
 
 ```js

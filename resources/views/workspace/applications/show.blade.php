@@ -30,13 +30,21 @@
                 </dl>
             </x-ui.card>
 
-            <x-ui.card title="Applicant">
+            @php
+                // Details as submitted. Gender and disability are deliberately not shown to reviewers.
+                $details = $application->applicantDetails();
+                $age = ! empty($details['date_of_birth']) ? \Illuminate\Support\Carbon::parse($details['date_of_birth'])->diffInYears($application->submitted_at ?? now()) : null;
+            @endphp
+            <x-ui.card title="Applicant" :description="$application->applicant_snapshot ? 'As submitted ' . $application->submitted_at?->format('j M Y') : 'Current profile'">
                 <dl class="grid gap-4 text-sm sm:grid-cols-2">
-                    <div><dt class="text-xs text-slate-500">E-mail</dt><dd class="mt-0.5"><a href="mailto:{{ $applicant?->email }}" class="font-medium text-uew-royal hover:underline">{{ $applicant?->email }}</a></dd></div>
-                    <div><dt class="text-xs text-slate-500">Phone</dt><dd class="mt-0.5 font-mono text-slate-900">{{ $applicant?->phone ?? '—' }}</dd></div>
-                    <div><dt class="text-xs text-slate-500">Affiliation</dt><dd class="mt-0.5 text-slate-900">{{ $applicant?->affiliation?->label() ?? '—' }}</dd></div>
-                    <div><dt class="text-xs text-slate-500">Institution</dt><dd class="mt-0.5 text-slate-900">{{ $applicant?->institution ?? '—' }}</dd></div>
-                    <div class="sm:col-span-2"><dt class="text-xs text-slate-500">Department / programme</dt><dd class="mt-0.5 text-slate-900">{{ $applicant?->department ?? '—' }}</dd></div>
+                    <div><dt class="text-xs text-slate-500">E-mail</dt><dd class="mt-0.5"><a href="mailto:{{ $details['email'] ?? '' }}" class="font-medium text-uew-royal hover:underline">{{ $details['email'] ?? '—' }}</a></dd></div>
+                    <div><dt class="text-xs text-slate-500">Phone</dt><dd class="mt-0.5 font-mono text-slate-900">{{ $details['phone'] ?? '—' }}</dd></div>
+                    <div><dt class="text-xs text-slate-500">Affiliation</dt><dd class="mt-0.5 text-slate-900">{{ \App\Support\Demographics::affiliationLabel($details['affiliation'] ?? null) ?? '—' }}</dd></div>
+                    <div><dt class="text-xs text-slate-500">Institution</dt><dd class="mt-0.5 text-slate-900">{{ $details['institution'] ?? '—' }}</dd></div>
+                    <div><dt class="text-xs text-slate-500">Age</dt><dd class="mt-0.5 font-mono text-slate-900">{{ $age !== null ? (int) $age : '—' }}</dd></div>
+                    <div><dt class="text-xs text-slate-500">Region</dt><dd class="mt-0.5 text-slate-900">{{ $details['region'] ?? '—' }}</dd></div>
+                    <div><dt class="text-xs text-slate-500">Education</dt><dd class="mt-0.5 text-slate-900">{{ \App\Support\Demographics::EDUCATION_LEVELS[$details['education_level'] ?? ''] ?? '—' }}</dd></div>
+                    <div><dt class="text-xs text-slate-500">Department / programme</dt><dd class="mt-0.5 text-slate-900">{{ $details['department'] ?? '—' }}</dd></div>
                     @if ($applicant?->bio)
                         <div class="sm:col-span-2"><dt class="text-xs text-slate-500">Bio</dt><dd class="mt-0.5 whitespace-pre-line text-slate-700">{{ $applicant->bio }}</dd></div>
                     @endif
@@ -60,6 +68,28 @@
                     @endif
                 @endcan
             </x-ui.card>
+
+            @if ($application->progressReports->isNotEmpty())
+                <x-ui.card title="Progress & budget reports" padding="p-0">
+                    <ul class="divide-y divide-slate-100">
+                        @foreach ($application->progressReports as $report)
+                            <li class="flex flex-wrap items-center gap-4 px-5 py-3.5">
+                                <div class="min-w-0 flex-1">
+                                    <a href="{{ route('workspace.progress-reports.show', $report) }}" class="font-semibold text-slate-900 hover:text-uew-royal">{{ $report->period }}</a>
+                                    <p class="text-xs text-slate-500"><span class="font-mono">{{ $report->reference }}</span> · GH₵ {{ number_format((float) $report->budget_spent, 2) }} spent of {{ number_format((float) $report->budget_received, 2) }}</p>
+                                </div>
+                                <x-ui.badge :tone="$report->status->tone()" dot>{{ $report->status->label() }}</x-ui.badge>
+                            </li>
+                        @endforeach
+                    </ul>
+                </x-ui.card>
+            @endif
+
+            @include('partials.conversation', [
+                'messages' => $application->messages,
+                'action' => auth()->user()->can('message', $application) && $application->user_id !== auth()->id() ? route('workspace.applications.messages.store', $application) : null,
+                'staffView' => true,
+            ])
         </div>
 
         <div class="space-y-6">
@@ -92,6 +122,14 @@
                 </x-ui.card>
             @else
                 <x-ui.alert tone="info">You cannot review your own application.</x-ui.alert>
+            @endcan
+
+            @can('members.manage')
+                @if ($applicant)
+                    <x-ui.card title="Award a badge" description="Shows on the member's profile and adds XP.">
+                        @include('workspace.members._award-form', ['member' => $applicant, 'programId' => $application->program_id, 'types' => $achievementTypes])
+                    </x-ui.card>
+                @endif
             @endcan
 
             <x-ui.card title="History" padding="p-0">

@@ -4,7 +4,9 @@ namespace Tests\Feature\Site;
 
 use App\Enums\ProjectStatus;
 use App\Models\Organization;
+use App\Models\Page;
 use App\Models\Post;
+use App\Models\Program;
 use App\Models\Project;
 use App\Models\Publication;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -36,7 +38,7 @@ class PublicSiteTest extends TestCase
         Post::factory()->create();
         Publication::factory()->create();
         Organization::factory()->create();
-        \App\Models\Program::factory()->create();
+        Program::factory()->create();
 
         $this->get($url)
             ->assertOk()
@@ -58,8 +60,8 @@ class PublicSiteTest extends TestCase
 
     public function test_cms_pages_render_and_hidden_ones_404(): void
     {
-        \App\Models\Page::create(['slug' => 'about', 'title' => 'About the Hub', 'body' => '## Hello', 'is_published' => true]);
-        \App\Models\Page::create(['slug' => 'secret', 'title' => 'Secret', 'body' => 'x', 'is_published' => false]);
+        Page::create(['slug' => 'about', 'title' => 'About the Hub', 'body' => '## Hello', 'is_published' => true]);
+        Page::create(['slug' => 'secret', 'title' => 'Secret', 'body' => 'x', 'is_published' => false]);
 
         $this->get('/about')->assertOk()->assertSee('<h2>Hello</h2>', false);
         $this->get('/secret')->assertNotFound();

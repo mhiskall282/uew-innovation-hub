@@ -4,9 +4,14 @@
     $tabs = [
         ['Overview', 'portal.dashboard', 'home'],
         ['My applications', 'portal.applications.*', 'inbox'],
+        ['Progress reports', 'portal.reports.*', 'clipboard'],
+        ['Notifications', 'notifications.*', 'bell'],
         ['Profile & settings', 'portal.profile.*', 'cog'],
     ];
-    $routes = ['portal.dashboard' => 'portal.dashboard', 'portal.applications.*' => 'portal.applications.index', 'portal.profile.*' => 'portal.profile.edit'];
+    $routes = [
+        'portal.dashboard' => 'portal.dashboard', 'portal.applications.*' => 'portal.applications.index',
+        'portal.reports.*' => 'portal.reports.index', 'notifications.*' => 'notifications.index', 'portal.profile.*' => 'portal.profile.edit',
+    ];
 @endphp
 <x-layouts.site :title="$title">
     <section class="border-b border-slate-200 bg-uew-canvas">

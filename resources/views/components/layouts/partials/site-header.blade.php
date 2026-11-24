@@ -8,6 +8,8 @@
     <div class="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:h-[72px]">
         {{-- Brand --}}
         <a href="{{ route('site.home') }}" class="flex shrink-0 items-center gap-3" aria-label="UEW Innovation Hub home">
+            <img src="{{ asset('images/uew/uew-logo.png') }}" alt="" width="44" height="43" class="hidden size-10 sm:block lg:size-11">
+            <span class="hidden h-9 w-px bg-slate-200 sm:block" aria-hidden="true"></span>
             <x-ui.crest class="size-10 lg:size-11" />
             <span class="leading-tight">
                 <span class="block text-[15px] font-extrabold tracking-tight text-uew-navy">UEW Innovation Hub</span>
@@ -47,6 +49,9 @@
                     <x-ui.icon name="arrow-right" class="size-4" />
                 </a>
             @else
+                @if ($user->hasVerifiedEmail())
+                    <x-ui.notification-bell :user="$user" />
+                @endif
                 <div class="relative" x-data="{ menu: false }" @click.outside="menu = false" @keydown.escape="menu = false">
                     <button type="button" @click="menu = ! menu" class="flex items-center gap-2 rounded-full border border-slate-200 bg-white py-1 pr-3 pl-1 transition hover:border-slate-300 hover:bg-slate-50" :aria-expanded="menu" aria-haspopup="menu">
                         <span class="flex size-8 items-center justify-center rounded-full bg-gradient-to-br from-uew-navy to-uew-royal text-[11px] font-bold text-white">{{ $user->initials() }}</span>
@@ -66,6 +71,7 @@
                             @else
                                 <a href="{{ route('portal.dashboard') }}" role="menuitem" class="flex items-center gap-2.5 px-4 py-2 text-slate-700 hover:bg-slate-50"><x-ui.icon name="home" class="size-4 text-slate-400" /> My account</a>
                                 <a href="{{ route('portal.applications.index') }}" role="menuitem" class="flex items-center gap-2.5 px-4 py-2 text-slate-700 hover:bg-slate-50"><x-ui.icon name="inbox" class="size-4 text-slate-400" /> My applications</a>
+                                <a href="{{ route('portal.reports.index') }}" role="menuitem" class="flex items-center gap-2.5 px-4 py-2 text-slate-700 hover:bg-slate-50"><x-ui.icon name="clipboard" class="size-4 text-slate-400" /> Progress reports</a>
                                 <a href="{{ route('portal.profile.edit') }}" role="menuitem" class="flex items-center gap-2.5 px-4 py-2 text-slate-700 hover:bg-slate-50"><x-ui.icon name="cog" class="size-4 text-slate-400" /> Profile & settings</a>
                             @endif
                         </div>
@@ -78,12 +84,19 @@
             @endguest
         </div>
 
-        {{-- Mobile toggle --}}
-        <button type="button" @click="open = ! open" class="ml-auto inline-flex size-10 items-center justify-center rounded-lg text-slate-700 ring-1 ring-slate-200 ring-inset hover:bg-slate-50 lg:hidden" :aria-expanded="open" aria-controls="mobile-nav">
+        {{-- Mobile bell and toggle --}}
+        <div class="ml-auto flex items-center gap-2 lg:hidden">
+        @auth
+            @if ($user->hasVerifiedEmail())
+                <x-ui.notification-bell :user="$user" />
+            @endif
+        @endauth
+        <button type="button" @click="open = ! open" class="inline-flex size-10 items-center justify-center rounded-lg text-slate-700 ring-1 ring-slate-200 ring-inset hover:bg-slate-50 lg:hidden" :aria-expanded="open" aria-controls="mobile-nav">
             <span class="sr-only">Open menu</span>
             <x-ui.icon name="menu" class="size-5" x-show="! open" />
             <x-ui.icon name="x" class="size-5" x-show="open" x-cloak />
         </button>
+        </div>
     </div>
 
     {{-- Mobile drawer --}}

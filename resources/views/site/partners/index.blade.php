@@ -1,11 +1,7 @@
 <x-layouts.site title="Partners" description="Funders, government agencies and institutions working with the UEW Innovation Hub.">
-    <section class="border-b border-slate-200 bg-uew-canvas">
-        <div class="mx-auto max-w-7xl px-6 py-14">
-            <p class="text-xs font-bold tracking-widest text-uew-gold-dark uppercase">Collaboration</p>
-            <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Our partners</h1>
-            <p class="mt-3 max-w-2xl text-slate-600">{{ $total }} organisations fund, implement and advise on Hub projects. To partner with us, email <a class="font-semibold text-uew-royal hover:underline" href="mailto:{{ config('hub.contact_email') }}">{{ config('hub.contact_email') }}</a>.</p>
-        </div>
-    </section>
+    <x-ui.page-hero eyebrow="Collaboration" title="Our partners" photo="creative-arts">
+        {{ $total }} organisations fund, implement and advise on Hub projects. To partner with us, e-mail <a class="font-semibold hover:underline" href="mailto:{{ config('hub.contact_email') }}">{{ config('hub.contact_email') }}</a>.
+    </x-ui.page-hero>
 
     <section class="mx-auto max-w-7xl space-y-12 px-6 py-12">
         @forelse ($groups as $type => $partners)

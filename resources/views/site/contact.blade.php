@@ -1,11 +1,7 @@
 <x-layouts.site title="Contact us" description="Get in touch with the UEW Innovation Hub about projects, partnerships, funding or media enquiries.">
-    <section class="border-b border-slate-200 bg-uew-canvas">
-        <div class="mx-auto max-w-7xl px-6 py-14">
-            <p class="text-xs font-bold tracking-widest text-uew-gold-dark uppercase">Contact</p>
-            <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Get in touch</h1>
-            <p class="mt-3 max-w-2xl text-slate-600">Questions about a project, partnering with the Hub, funding or media requests. We usually reply within two working days.</p>
-        </div>
-    </section>
+    <x-ui.page-hero eyebrow="Contact" title="Get in touch" photo="north-campus">
+        Questions about a project, partnering with the Hub, funding or media requests. We usually reply within two working days.
+    </x-ui.page-hero>
 
     <div class="mx-auto grid max-w-7xl gap-10 px-6 py-12 lg:grid-cols-12">
         <aside class="space-y-5 lg:col-span-4">

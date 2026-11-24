@@ -23,7 +23,7 @@ class RegisterController extends Controller
     {
         abort_unless($settings->bool('registration_open'), 403, 'New registrations are paused.');
 
-        $user = $members->register($request->safe()->only(['name', 'email', 'password']));
+        $user = $members->register($request->accountData());
 
         Auth::login($user);
         $request->session()->regenerate();

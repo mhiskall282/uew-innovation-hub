@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Portal;
 use App\Http\Controllers\Site;
 use App\Http\Controllers\Workspace;
@@ -27,6 +28,9 @@ Route::name('site.')->group(function () {
     Route::get('/news/{post}', [Site\NewsController::class, 'show'])->name('news.show');
 
     Route::get('/partners', [Site\PartnerController::class, 'index'])->name('partners.index');
+
+    Route::get('/community', [Site\CommunityController::class, 'index'])->name('community.index');
+    Route::get('/community/{user}', [Site\CommunityController::class, 'show'])->whereNumber('user')->name('community.show');
 
     Route::get('/contact', [Site\ContactController::class, 'create'])->name('contact');
     Route::post('/contact', [Site\ContactController::class, 'store'])->middleware('throttle:contact-messages')->name('contact.store');
@@ -79,6 +83,11 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::middleware('verified.email')->group(function () {
         Route::get('/onboarding', [Portal\OnboardingController::class, 'show'])->name('onboarding.show');
         Route::post('/onboarding', [Portal\OnboardingController::class, 'store'])->name('onboarding.store');
+
+        // In-app notifications, for members and staff alike (always the signed-in user's own).
+        Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
+        Route::get('/notifications/{id}', [NotificationController::class, 'open'])->whereUuid('id')->name('notifications.open');
     });
 });
 
@@ -98,6 +107,16 @@ Route::middleware(['auth', 'active', 'verified.email', 'onboarded'])->group(func
         Route::get('/applications/{application}', [Portal\ApplicationController::class, 'show'])->name('applications.show');
         Route::post('/applications/{application}/withdraw', [Portal\ApplicationController::class, 'withdraw'])->name('applications.withdraw');
         Route::get('/applications/{application}/files/{key}', [Portal\ApplicationController::class, 'file'])->name('applications.file');
+        Route::post('/applications/{application}/messages', [Portal\MessageController::class, 'store'])->middleware('throttle:20,1')->name('applications.messages.store');
+
+        // Progress and budget reports (accepted applicants only; checked by policy).
+        Route::get('/reports', [Portal\ProgressReportController::class, 'index'])->name('reports.index');
+        Route::get('/applications/{application}/reports/create', [Portal\ProgressReportController::class, 'create'])->name('reports.create');
+        Route::post('/applications/{application}/reports', [Portal\ProgressReportController::class, 'store'])->middleware('throttle:10,1')->name('reports.store');
+        Route::get('/reports/{report}', [Portal\ProgressReportController::class, 'show'])->name('reports.show');
+        Route::get('/reports/{report}/edit', [Portal\ProgressReportController::class, 'edit'])->name('reports.edit');
+        Route::put('/reports/{report}', [Portal\ProgressReportController::class, 'update'])->name('reports.update');
+
         Route::get('/profile', [Portal\ProfileController::class, 'edit'])->name('profile.edit');
         Route::put('/profile', [Portal\ProfileController::class, 'update'])->name('profile.update');
         Route::put('/profile/password', [Portal\ProfileController::class, 'password'])->name('profile.password');
@@ -134,6 +153,12 @@ Route::prefix('workspace')->middleware(['auth', 'active', 'verified.email', 'can
         Route::get('/applications/{application}', [Workspace\ApplicationController::class, 'show'])->name('applications.show');
         Route::put('/applications/{application}', [Workspace\ApplicationController::class, 'update'])->name('applications.update');
         Route::get('/applications/{application}/files/{key}', [Workspace\ApplicationController::class, 'file'])->name('applications.file');
+        Route::post('/applications/{application}/messages', [Workspace\MessageController::class, 'store'])->middleware('throttle:30,1')->name('applications.messages.store');
+
+        // Incubation board: progress and budget reports from accepted applicants.
+        Route::get('/progress-reports', [Workspace\ProgressReportController::class, 'index'])->name('progress-reports.index');
+        Route::get('/progress-reports/{report}', [Workspace\ProgressReportController::class, 'show'])->name('progress-reports.show');
+        Route::put('/progress-reports/{report}', [Workspace\ProgressReportController::class, 'update'])->name('progress-reports.update');
     });
 
     // People
@@ -142,6 +167,8 @@ Route::prefix('workspace')->middleware(['auth', 'active', 'verified.email', 'can
         Route::get('/members/export', [Workspace\MemberController::class, 'export'])->name('members.export');
         Route::get('/members/{member}', [Workspace\MemberController::class, 'show'])->name('members.show');
         Route::patch('/members/{member}/toggle', [Workspace\MemberController::class, 'toggle'])->name('members.toggle');
+        Route::post('/members/{member}/achievements', [Workspace\AchievementController::class, 'store'])->name('achievements.store');
+        Route::delete('/achievements/{achievement}', [Workspace\AchievementController::class, 'destroy'])->name('achievements.destroy');
     });
 
     Route::middleware('can:broadcasts.send')->group(function () {
@@ -174,7 +201,10 @@ Route::prefix('workspace')->middleware(['auth', 'active', 'verified.email', 'can
         Route::delete('/messages/{message}', [Workspace\ContactMessageController::class, 'destroy'])->name('messages.destroy');
     });
 
-    Route::get('/reports', Workspace\ReportController::class)->middleware('can:reports.view')->name('reports.index');
+    Route::middleware('can:reports.view')->group(function () {
+        Route::get('/reports', [Workspace\ReportController::class, 'index'])->name('reports.index');
+        Route::get('/reports/pdf', [Workspace\ReportController::class, 'pdf'])->middleware('throttle:10,1')->name('reports.pdf');
+    });
 
     // Administration
     Route::patch('/users/{user}/toggle', [Workspace\UserController::class, 'toggle'])->name('users.toggle');
@@ -208,5 +238,5 @@ Route::prefix('workspace')->middleware(['auth', 'active', 'verified.email', 'can
 */
 
 Route::get('/{page}', Site\PageController::class)
-    ->where('page', '^(?!up$|api$|workspace$|portal$)[a-z0-9-]+$')
+    ->where('page', '^(?!up$|api$|workspace$|portal$|notifications$|community$)[a-z0-9-]+$')
     ->name('site.page');

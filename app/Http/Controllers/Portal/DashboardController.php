@@ -40,6 +40,7 @@ class DashboardController extends Controller
             'applications' => $applications,
             'drafts' => $applications->where('status', ApplicationStatus::Draft),
             'recommended' => $recommended,
+            'achievements' => $user->achievements()->take(6)->get(),
             'counts' => [
                 'active' => $applications->whereIn('status', ApplicationStatus::open())->count(),
                 'accepted' => $applications->where('status', ApplicationStatus::Approved)->count(),

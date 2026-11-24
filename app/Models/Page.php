@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
 /** A CMS page (About, FAQ, Privacy, Terms, ...), written in Markdown. */
@@ -47,8 +48,8 @@ class Page extends Model
         return $query->where('is_published', true);
     }
 
-    /** @return \Illuminate\Support\Collection<int, array{slug: string, title: string}> */
-    public static function footerLinks(): \Illuminate\Support\Collection
+    /** @return Collection<int, array{slug: string, title: string}> */
+    public static function footerLinks(): Collection
     {
         return collect(Cache::remember(self::FOOTER_CACHE_KEY, 3600, fn () => static::published()
             ->where('show_in_footer', true)

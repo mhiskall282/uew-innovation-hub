@@ -43,6 +43,7 @@ class MemberAccountTest extends TestCase
     {
         $this->post('/sign-up', [
             'name' => 'Ama Serwaa', 'email' => $email,
+            'phone' => '+233 24 555 1234', 'gender' => 'female', 'date_of_birth' => '2002-05-14', 'region' => 'Central',
             'password' => 'Secret-pass-123', 'password_confirmation' => 'Secret-pass-123', 'terms' => '1',
         ])->assertRedirect(route('verification.notice'));
 
@@ -56,6 +57,8 @@ class MemberAccountTest extends TestCase
         $this->assertSame(Role::Member, $user->role);
         $this->assertNull($user->email_verified_at);
         $this->assertAuthenticatedAs($user);
+        $this->assertSame('+233 24 555 1234', $user->phone);
+        $this->assertSame('female', $user->gender);
 
         $code = $this->codeSentTo('ama@example.com');
         $this->assertMatchesRegularExpression('/^\d{6}$/', $code);
@@ -69,6 +72,7 @@ class MemberAccountTest extends TestCase
     {
         $this->post('/sign-up', [
             'name' => 'Mallory', 'email' => 'm@example.com', 'role' => 'super_admin', 'is_active' => 1, 'email_verified_at' => now(),
+            'phone' => '+233 24 555 9999', 'gender' => 'prefer_not', 'date_of_birth' => '1990-01-01', 'region' => 'Volta',
             'password' => 'Secret-pass-123', 'password_confirmation' => 'Secret-pass-123', 'terms' => '1',
         ]);
 
@@ -97,10 +101,13 @@ class MemberAccountTest extends TestCase
 
         $this->post('/onboarding', [
             'name' => 'Ama Serwaa', 'phone' => '+233 24 555 1234', 'affiliation' => 'student',
+            'gender' => 'female', 'date_of_birth' => '2002-05-14', 'region' => 'Central', 'education_level' => 'undergraduate',
             'interests' => ['STEM', 'Fellowships'], 'marketing_opt_in' => '1',
         ])->assertRedirect(route('portal.dashboard'));
 
         $user->refresh();
+        $this->assertSame('Central', $user->region);
+        $this->assertSame('2002-05-14', $user->date_of_birth->toDateString());
         $this->assertNotNull($user->onboarded_at);
         $this->assertSame(['STEM', 'Fellowships'], $user->interests);
         $this->assertTrue($user->marketing_opt_in);
