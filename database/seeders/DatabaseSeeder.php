@@ -23,6 +23,14 @@ class DatabaseSeeder extends Seeder
             return;
         }
 
+        // Hosted test sites seed demo data once. The container re-runs seeding on
+        // every boot, and re-seeding would reset testers' passwords and decisions.
+        if (app()->isProduction() && \App\Models\User::where('email', 'admin@uew.edu.gh')->exists()) {
+            $this->command?->info('Demo data already present; leaving it untouched.');
+
+            return;
+        }
+
         $this->call([DemoContentSeeder::class, DemoProgrammesSeeder::class]);
     }
 }

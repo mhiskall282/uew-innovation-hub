@@ -62,9 +62,13 @@ services:
       - key: ADMIN_PASSWORD
         sync: false # 12+ characters, upper and lower case and a number
 
-      # Set to "true" only for a public demo; never for real data.
+      # TEST SITE: creates the demo accounts and sample content once, on first boot.
+      # Set to "false" (and use a fresh database) for the real launch.
       - key: SEED_DEMO_DATA
-        value: "false"
+        value: "true"
+      # Password for every demo account. Use a strong one; testers sign in with it.
+      - key: SEED_PASSWORD
+        sync: false
 
       # Uploaded documents. "private" = container disk (lost on redeploy on the free plan).
       - key: DOCUMENTS_DISK
