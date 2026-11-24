@@ -107,3 +107,9 @@ Steps:
 | 419 "page expired" | The form sat open past the session lifetime. Refresh and resubmit. |
 | Uploaded PDFs vanish after redeploy | Ephemeral disk. Use `DOCUMENTS_DISK=s3`. |
 | Locked out after failed sign-ins | Wait 15 minutes, or use **Forgot password**. |
+
+## Demo account passwords on hosted sites
+
+- In production, demo data is only seeded when `SEED_PASSWORD` is strong (12+ characters, upper and lower case, a number). Otherwise the seeder skips the demo accounts.
+- On every boot, `php artisan hub:secure-demo-accounts` finds accounts that still use a well-known default password (`password`, `secret`...) and moves them to `SEED_PASSWORD`. It never prints passwords, and it records each change in the audit log. If `SEED_PASSWORD` is missing or weak, it changes nothing and logs a warning.
+- To change the tester password later, set a new `SEED_PASSWORD` and have each tester change their password under their account settings. The command only replaces default passwords, never passwords people chose.

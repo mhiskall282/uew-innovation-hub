@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Console\Commands\SecureDemoAccounts;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -20,6 +21,20 @@ class DatabaseSeeder extends Seeder
 
         if (app()->isProduction() && ! config('hub.seed_demo_data')) {
             $this->command?->warn('Skipping demo data in production. Set SEED_DEMO_DATA=true to override.');
+
+            return;
+        }
+
+        // A hosted site must never get demo accounts with a guessable password.
+        if (app()->isProduction() && ! SecureDemoAccounts::isStrong((string) config('hub.seed_password'))) {
+            $this->command?->error('Not seeding demo accounts: set SEED_PASSWORD (12+ characters, upper and lower case, a number).');
+
+            return;
+        }
+
+        // A hosted site must never get demo accounts with a guessable password.
+        if (app()->isProduction() && ! SecureDemoAccounts::isStrong((string) config('hub.seed_password'))) {
+            $this->command?->error('Not seeding demo accounts: set SEED_PASSWORD (12+ characters, upper and lower case, a number).');
 
             return;
         }

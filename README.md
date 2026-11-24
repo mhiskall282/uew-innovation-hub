@@ -101,7 +101,7 @@ Demo data is for local use only. The seeder refuses to run in production unless 
 php artisan test
 ```
 
-125 feature and unit tests cover the public site, member sign-up with e-mail codes, onboarding, password reset, sign-in and lockout, the role-by-page access matrix, applications, notifications, messages, progress reports, badges and XP, the community page, profile pre-fill, content and user management, document access, the API and security headers. `RouteSmokeTest` requests every page as a guest and as every role and fails on any server error.
+128 feature and unit tests cover the public site, member sign-up with e-mail codes, onboarding, password reset, sign-in and lockout, the role-by-page access matrix, applications, notifications, messages, progress reports, badges and XP, the community page, profile pre-fill, content and user management, document access, the API and security headers. `RouteSmokeTest` requests every page as a guest and as every role and fails on any server error.
 
 CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs Pint, the asset build, a Blade compile check, the tests on SQLite and PostgreSQL, `composer audit`, `npm audit` and a Docker build on every push. Render deploys `main` automatically.
 

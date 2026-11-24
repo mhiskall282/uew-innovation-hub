@@ -41,6 +41,10 @@ if [[ "${SEED_DEMO_DATA:-false}" == "true" ]]; then
     php artisan db:seed --force
 fi
 
+# Accounts must never keep a well-known default password (e.g. demo accounts
+# seeded before SEED_PASSWORD was set). Moves them to SEED_PASSWORD.
+php artisan hub:secure-demo-accounts || echo "WARNING: some accounts still use a default password; set SEED_PASSWORD" >&2
+
 # 5. Copy legacy report/newsletter PDFs onto the documents disk (skips existing files).
 php artisan hub:import-documents || echo "WARNING: legacy document import failed" >&2
 

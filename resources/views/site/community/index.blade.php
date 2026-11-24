@@ -12,7 +12,7 @@
     </x-ui.page-hero>
 
     <section class="mx-auto grid max-w-7xl gap-8 px-6 py-12 lg:grid-cols-3">
-        <div class="lg:col-span-2">
+        <div class="min-w-0 lg:col-span-2">
             <h2 class="text-xs font-bold tracking-widest text-slate-500 uppercase">Leaderboard</h2>
             @if ($leaders->isEmpty())
                 <div class="mt-4 rounded-2xl border border-dashed border-slate-300 p-10 text-center">
@@ -25,7 +25,7 @@
                     @foreach ($leaders as $i => $member)
                         @php $level = $member->level(); @endphp
                         <li class="border-b border-slate-100 last:border-0">
-                            <a href="{{ route('site.community.show', $member) }}" class="flex items-center gap-4 px-5 py-4 transition hover:bg-uew-canvas/60">
+                            <a href="{{ route('site.community.show', $member) }}" class="flex items-center gap-3 px-4 py-4 transition hover:bg-uew-canvas/60 sm:gap-4 sm:px-5">
                                 <span @class([
                                     'flex size-9 shrink-0 items-center justify-center rounded-full font-mono text-sm font-bold',
                                     'bg-gradient-to-br from-uew-gold to-uew-gold-light text-uew-ink shadow-sm shadow-uew-gold/40' => $i === 0,
@@ -33,7 +33,7 @@
                                     'bg-amber-100 text-amber-800' => $i === 2,
                                     'bg-slate-100 text-slate-500' => $i > 2,
                                 ])>{{ $i + 1 }}</span>
-                                <span class="flex size-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-uew-navy to-uew-royal text-sm font-bold text-white">{{ $member->initials() }}</span>
+                                <span class="hidden size-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-uew-navy to-uew-royal text-sm font-bold text-white min-[420px]:flex">{{ $member->initials() }}</span>
                                 <span class="min-w-0 flex-1">
                                     <span class="block truncate font-semibold text-slate-900">{{ $member->name }}</span>
                                     <span class="block truncate text-xs text-slate-500">{{ $member->affiliation?->label() }}{{ $member->institution ? ' · ' . $member->institution : '' }}</span>
@@ -42,7 +42,7 @@
                                     <span class="block text-xs font-semibold text-uew-purple">{{ $level['name'] }}</span>
                                     <span class="block text-[11px] text-slate-500">{{ $member->achievements_count }} {{ Str::plural('badge', $member->achievements_count) }}</span>
                                 </span>
-                                <span class="w-20 text-right font-mono text-lg font-bold text-uew-navy">{{ number_format($member->xp) }}<span class="ml-0.5 text-[11px] font-semibold text-slate-400">XP</span></span>
+                                <span class="shrink-0 text-right font-mono text-lg font-bold text-uew-navy">{{ number_format($member->xp) }}<span class="ml-0.5 text-[11px] font-semibold text-slate-400">XP</span></span>
                             </a>
                         </li>
                     @endforeach
@@ -50,7 +50,7 @@
             @endif
         </div>
 
-        <aside class="space-y-6">
+        <aside class="min-w-0 space-y-6">
             <div>
                 <h2 class="text-xs font-bold tracking-widest text-slate-500 uppercase">Recent badges</h2>
                 <ul class="mt-4 space-y-3">
