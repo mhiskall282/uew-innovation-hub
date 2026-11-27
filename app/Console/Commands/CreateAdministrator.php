@@ -74,6 +74,9 @@ class CreateAdministrator extends Command
         $user = new User(['name' => $name, 'email' => $email, 'password' => $password]);
         $user->role = Role::SuperAdmin;
         $user->is_active = true;
+        // The address comes from whoever runs this on the server, so it is trusted.
+        // Without this the first Director could be locked out before SMTP is set up.
+        $user->email_verified_at = now();
         $user->save();
 
         $audit->record('user.created', "Created first Hub Director account for {$user->name} from the command line", $user);

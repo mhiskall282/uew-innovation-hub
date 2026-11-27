@@ -56,7 +56,7 @@
                     <button type="button" @click="menu = ! menu" class="flex items-center gap-2 rounded-full border border-slate-200 bg-white py-1 pr-3 pl-1 transition hover:border-slate-300 hover:bg-slate-50" :aria-expanded="menu" aria-haspopup="menu">
                         <span class="flex size-8 items-center justify-center rounded-full bg-gradient-to-br from-uew-navy to-uew-royal text-[11px] font-bold text-white">{{ $user->initials() }}</span>
                         <span class="max-w-28 truncate text-sm font-semibold text-slate-700">{{ $user->firstName() }}</span>
-                        <x-ui.icon name="chevron-down" class="size-3.5 text-slate-400 transition-transform" ::class="menu && 'rotate-180'" />
+                        <x-ui.icon name="chevron-down" class="size-3.5 text-slate-500 transition-transform" ::class="menu && 'rotate-180'" />
                     </button>
                     <div x-show="menu" x-cloak x-transition.origin.top.right role="menu" class="absolute right-0 mt-2 w-64 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-card-hover">
                         <div class="border-b border-slate-100 bg-uew-canvas/60 px-4 py-3">
@@ -66,13 +66,13 @@
                         </div>
                         <div class="py-1 text-sm">
                             @if ($user->isStaff())
-                                <a href="{{ route('workspace.dashboard') }}" role="menuitem" class="flex items-center gap-2.5 px-4 py-2 text-slate-700 hover:bg-slate-50"><x-ui.icon name="chart" class="size-4 text-slate-400" /> Staff workspace</a>
-                                <a href="{{ route('workspace.profile.edit') }}" role="menuitem" class="flex items-center gap-2.5 px-4 py-2 text-slate-700 hover:bg-slate-50"><x-ui.icon name="cog" class="size-4 text-slate-400" /> Account settings</a>
+                                <a href="{{ route('workspace.dashboard') }}" role="menuitem" class="flex items-center gap-2.5 px-4 py-2 text-slate-700 hover:bg-slate-50"><x-ui.icon name="chart" class="size-4 text-slate-500" /> Staff workspace</a>
+                                <a href="{{ route('workspace.profile.edit') }}" role="menuitem" class="flex items-center gap-2.5 px-4 py-2 text-slate-700 hover:bg-slate-50"><x-ui.icon name="cog" class="size-4 text-slate-500" /> Account settings</a>
                             @else
-                                <a href="{{ route('portal.dashboard') }}" role="menuitem" class="flex items-center gap-2.5 px-4 py-2 text-slate-700 hover:bg-slate-50"><x-ui.icon name="home" class="size-4 text-slate-400" /> My account</a>
-                                <a href="{{ route('portal.applications.index') }}" role="menuitem" class="flex items-center gap-2.5 px-4 py-2 text-slate-700 hover:bg-slate-50"><x-ui.icon name="inbox" class="size-4 text-slate-400" /> My applications</a>
-                                <a href="{{ route('portal.reports.index') }}" role="menuitem" class="flex items-center gap-2.5 px-4 py-2 text-slate-700 hover:bg-slate-50"><x-ui.icon name="clipboard" class="size-4 text-slate-400" /> Progress reports</a>
-                                <a href="{{ route('portal.profile.edit') }}" role="menuitem" class="flex items-center gap-2.5 px-4 py-2 text-slate-700 hover:bg-slate-50"><x-ui.icon name="cog" class="size-4 text-slate-400" /> Profile & settings</a>
+                                <a href="{{ route('portal.dashboard') }}" role="menuitem" class="flex items-center gap-2.5 px-4 py-2 text-slate-700 hover:bg-slate-50"><x-ui.icon name="home" class="size-4 text-slate-500" /> My account</a>
+                                <a href="{{ route('portal.applications.index') }}" role="menuitem" class="flex items-center gap-2.5 px-4 py-2 text-slate-700 hover:bg-slate-50"><x-ui.icon name="inbox" class="size-4 text-slate-500" /> My applications</a>
+                                <a href="{{ route('portal.reports.index') }}" role="menuitem" class="flex items-center gap-2.5 px-4 py-2 text-slate-700 hover:bg-slate-50"><x-ui.icon name="clipboard" class="size-4 text-slate-500" /> Progress reports</a>
+                                <a href="{{ route('portal.profile.edit') }}" role="menuitem" class="flex items-center gap-2.5 px-4 py-2 text-slate-700 hover:bg-slate-50"><x-ui.icon name="cog" class="size-4 text-slate-500" /> Profile & settings</a>
                             @endif
                         </div>
                         <form method="POST" action="{{ route('logout') }}" class="border-t border-slate-100 py-1">

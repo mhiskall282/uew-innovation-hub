@@ -101,7 +101,7 @@ Demo data is for local use only. The seeder refuses to run in production unless 
 php artisan test
 ```
 
-128 feature and unit tests cover the public site, member sign-up with e-mail codes, onboarding, password reset, sign-in and lockout, the role-by-page access matrix, applications, notifications, messages, progress reports, badges and XP, the community page, profile pre-fill, content and user management, document access, the API and security headers. `RouteSmokeTest` requests every page as a guest and as every role and fails on any server error.
+148 feature and unit tests, plus Playwright browser tests (`npm run test:e2e`: journeys on Chromium, Firefox, WebKit and mobile, axe accessibility checks, and layouts from 320 to 1920px), cover the public site, member sign-up with e-mail codes, onboarding, password reset, sign-in and lockout, the role-by-page access matrix, applications, notifications, messages, progress reports, badges and XP, the community page, profile pre-fill, content and user management, document access, the API and security headers. `RouteSmokeTest` requests every page as a guest and as every role and fails on any server error.
 
 CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs Pint, the asset build, a Blade compile check, the tests on SQLite and PostgreSQL, `composer audit`, `npm audit` and a Docker build on every push. Render deploys `main` automatically.
 
@@ -120,6 +120,7 @@ Step-by-step instructions, costs and limits are in [docs/deployment.md](docs/dep
 - [Security](docs/security.md): access control, data protection, hardening checklist
 - [Member guide](docs/guides/member-guide.md): sign-up, applying, reports, badges, troubleshooting
 - [Staff guide](docs/guides/staff-guide.md): roles, programmes, reviews, incubation board, administration, troubleshooting
+- [Audit, test results and handover](docs/audit/FINAL_PROJECT_HANDOVER_REPORT.md)
 - [Stakeholder overview](docs/guides/stakeholder-overview.md): what the platform does, value, data protection, costs
 
 ## Repository layout

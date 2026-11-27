@@ -39,6 +39,9 @@ Route::name('site.')->group(function () {
     Route::get('/documents/publications/{publication}', [Site\DocumentController::class, 'publication'])->name('documents.publication');
 
     Route::get('/unsubscribe/{user}', Site\UnsubscribeController::class)->middleware('signed')->name('unsubscribe');
+
+    Route::get('/robots.txt', [Site\SeoController::class, 'robots'])->name('robots');
+    Route::get('/sitemap.xml', [Site\SeoController::class, 'sitemap'])->name('sitemap');
 });
 
 // Old URLs.

@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -34,6 +35,13 @@ class AppServiceProvider extends ServiceProvider
         // Outgoing mail can be configured from the workspace (Site settings > E-mail).
         if (! $this->app->runningUnitTests()) {
             $this->app->make(MailSettings::class)->apply();
+        }
+
+        // Development and testing safety net: send every e-mail to one inbox so
+        // demo accounts (real @uew.edu.gh addresses) never receive test mail.
+        // Ignored in production.
+        if (! $this->app->isProduction() && ($alwaysTo = config('mail.always_to'))) {
+            Mail::alwaysTo($alwaysTo);
         }
 
         // Catch N+1 queries during development and tests.

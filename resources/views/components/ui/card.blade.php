@@ -7,7 +7,8 @@
                 @if ($description)<p class="mt-0.5 text-xs text-slate-500">{{ $description }}</p>@endif
             </div>
             @isset($actions)
-                <div class="flex shrink-0 items-center gap-2">{{ $actions }}</div>
+                {{-- Wraps under the title on narrow screens instead of overflowing. --}}
+                <div class="flex max-w-full flex-wrap items-center gap-2">{{ $actions }}</div>
             @endisset
         </header>
     @endif

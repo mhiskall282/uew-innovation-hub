@@ -31,6 +31,6 @@
         @if ($publication->doi_url)
             <x-ui.button :href="$publication->doi_url" variant="secondary" size="sm" icon="external" target="_blank" rel="noopener nofollow">DOI</x-ui.button>
         @endif
-        <span class="font-mono text-[11px] text-slate-400">{{ number_format($publication->downloads_count) }} downloads</span>
+        <span class="font-mono text-[11px] text-slate-500">{{ number_format($publication->downloads_count) }} downloads</span>
     </div>
 </article>

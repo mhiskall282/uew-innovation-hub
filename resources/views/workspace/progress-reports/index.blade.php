@@ -43,7 +43,7 @@
                                     <a href="{{ route('workspace.progress-reports.index', ['programme' => $row->program->id]) }}" class="font-semibold text-slate-900 hover:text-uew-royal">{{ $row->program->title }}</a>
                                     <p class="text-xs text-slate-500">{{ $row->program->type->label() }}</p>
                                 </td>
-                                <td class="px-3 py-3 text-right font-mono">{{ $row->reporting }}<span class="text-slate-400">/{{ $row->accepted }}</span></td>
+                                <td class="px-3 py-3 text-right font-mono">{{ $row->reporting }}<span class="text-slate-500">/{{ $row->accepted }}</span></td>
                                 <td class="px-3 py-3 text-right font-mono">{{ $row->reports }}</td>
                                 <td class="px-3 py-3 text-right font-mono text-slate-500">{{ $row->funding ? number_format($row->funding) : '—' }}</td>
                                 <td class="px-3 py-3 text-right font-mono">{{ number_format($row->received) }}</td>
@@ -53,7 +53,7 @@
                                         <x-ui.progress :value="min(100, $row->burn)" :tone="$row->burn > 100 ? 'red' : 'royal'" />
                                         <p @class(['mt-1 font-mono text-[11px]', 'text-red-600 font-semibold' => $row->burn > 100, 'text-slate-500' => $row->burn <= 100])>{{ $row->burn }}%</p>
                                     @else
-                                        <span class="text-xs text-slate-400">No reports</span>
+                                        <span class="text-xs text-slate-500">No reports</span>
                                     @endif
                                 </td>
                             </tr>
@@ -108,7 +108,7 @@
                                 </td>
                                 <td class="px-3 py-3 text-slate-700">{{ $report->period }}</td>
                                 <td class="hidden px-3 py-3 text-slate-600 lg:table-cell">{{ $report->application?->program?->title }}</td>
-                                <td class="px-3 py-3 text-right font-mono">{{ number_format((float) $report->budget_spent) }} <span class="text-slate-400">/ {{ number_format((float) $report->budget_received) }}</span></td>
+                                <td class="px-3 py-3 text-right font-mono">{{ number_format((float) $report->budget_spent) }} <span class="text-slate-500">/ {{ number_format((float) $report->budget_received) }}</span></td>
                                 <td class="px-5 py-3"><x-ui.badge :tone="$report->status->tone()" dot>{{ $report->status->label() }}</x-ui.badge></td>
                             </tr>
                         @endforeach

@@ -137,7 +137,7 @@
                     @forelse ($history as $entry)
                         <li class="px-5 py-3">
                             <p class="text-xs text-slate-700">{{ $entry->description }}</p>
-                            <p class="mt-0.5 text-[11px] text-slate-400">{{ $entry->user?->name ?? 'System' }} · {{ $entry->created_at->format('j M Y, H:i') }}</p>
+                            <p class="mt-0.5 text-[11px] text-slate-500">{{ $entry->user?->name ?? 'System' }} · {{ $entry->created_at->format('j M Y, H:i') }}</p>
                         </li>
                     @empty
                         <li class="px-5 py-6 text-sm text-slate-500">No history yet.</li>

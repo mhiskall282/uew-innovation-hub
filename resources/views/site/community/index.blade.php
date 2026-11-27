@@ -42,7 +42,7 @@
                                     <span class="block text-xs font-semibold text-uew-purple">{{ $level['name'] }}</span>
                                     <span class="block text-[11px] text-slate-500">{{ $member->achievements_count }} {{ Str::plural('badge', $member->achievements_count) }}</span>
                                 </span>
-                                <span class="shrink-0 text-right font-mono text-lg font-bold text-uew-navy">{{ number_format($member->xp) }}<span class="ml-0.5 text-[11px] font-semibold text-slate-400">XP</span></span>
+                                <span class="shrink-0 text-right font-mono text-lg font-bold text-uew-navy">{{ number_format($member->xp) }}<span class="ml-0.5 text-[11px] font-semibold text-slate-500">XP</span></span>
                             </a>
                         </li>
                     @endforeach
@@ -60,7 +60,7 @@
                             <span class="min-w-0">
                                 <span class="block text-sm font-semibold text-slate-900">{{ $achievement->user?->name }}</span>
                                 <span class="block text-xs text-slate-600">{{ $achievement->title }}</span>
-                                <span class="block text-[11px] text-slate-400">{{ $achievement->awarded_at->diffForHumans() }}</span>
+                                <span class="block text-[11px] text-slate-500">{{ $achievement->awarded_at->diffForHumans() }}</span>
                             </span>
                         </li>
                     @empty

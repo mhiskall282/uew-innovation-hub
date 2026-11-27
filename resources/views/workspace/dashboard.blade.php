@@ -181,7 +181,7 @@
                                 <x-ui.badge :tone="$log->tone()" size="xs" class="mt-0.5 shrink-0">{{ $log->area() }}</x-ui.badge>
                                 <div class="min-w-0">
                                     <p class="truncate text-xs text-slate-700">{{ $log->description }}</p>
-                                    <p class="text-[11px] text-slate-400">{{ $log->user?->name ?? 'Public' }} · {{ $log->created_at->diffForHumans() }}</p>
+                                    <p class="text-[11px] text-slate-500">{{ $log->user?->name ?? 'Public' }} · {{ $log->created_at->diffForHumans() }}</p>
                                 </div>
                             </li>
                         @empty

@@ -14,7 +14,7 @@
         @if ($activeStatus)<input type="hidden" name="status" value="{{ $activeStatus->value }}">@endif
         <label class="relative flex-1">
             <span class="sr-only">Search</span>
-            <x-ui.icon name="search" class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400" />
+            <x-ui.icon name="search" class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-500" />
             <input type="search" name="search" value="{{ $search }}" placeholder="Name, e-mail, subject or text"
                    class="block w-full rounded-lg border border-slate-300 py-2 pr-3 pl-9 text-sm focus:border-uew-royal focus:ring-2 focus:ring-uew-royal/20 focus:outline-none">
         </label>
@@ -33,7 +33,7 @@
                             <div class="min-w-0 flex-1">
                                 <div class="flex flex-wrap items-baseline justify-between gap-2">
                                     <p @class(['truncate text-sm text-slate-900', 'font-bold' => $enquiry->status->value === 'new', 'font-medium' => $enquiry->status->value !== 'new'])>{{ $enquiry->name }} <span class="font-normal text-slate-500">· {{ $enquiry->email }}</span></p>
-                                    <time class="shrink-0 text-xs text-slate-400" datetime="{{ $enquiry->created_at->toIso8601String() }}">{{ $enquiry->created_at->diffForHumans() }}</time>
+                                    <time class="shrink-0 text-xs text-slate-500" datetime="{{ $enquiry->created_at->toIso8601String() }}">{{ $enquiry->created_at->diffForHumans() }}</time>
                                 </div>
                                 <p class="truncate text-sm font-semibold text-slate-800">{{ $enquiry->subject }}</p>
                                 <p class="truncate text-xs text-slate-500">{{ Str::limit($enquiry->message, 140) }}</p>

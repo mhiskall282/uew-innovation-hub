@@ -130,7 +130,7 @@ class DemoContentSeeder extends Seeder
                 "Applications are open for the 2026 Innovation Fellowship.\n\nSuccessful teams receive **up to GH₵ 25,000** in seed funding, lab space at the Hub and mentorship from industry partners.\n\n[Apply online](/apply) before the end of the month."],
             ['Hydroponics farm open day (draft)', PostType::News, 'Events', $staff[Role::Intern->value], null, false,
                 'Draft write-up of the farm open day for an officer to review.',
-                "Over 200 students and farmers visited the hydroponics demonstration farm last Saturday.\n\nTODO: add quotes from Dr. Appiah."],
+                "Over 200 students and farmers visited the hydroponics demonstration farm last Saturday.\n\nEditor's note: quotes from Dr. Appiah to be added before publishing."],
         ] as [$title, $type, $category, $author, $publishedAt, $featured, $summary, $content]) {
             Post::updateOrCreate(['title' => $title], [
                 'type' => $type, 'category' => $category, 'author_id' => $author->id, 'published_at' => $publishedAt,

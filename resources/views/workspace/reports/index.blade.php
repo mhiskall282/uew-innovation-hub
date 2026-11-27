@@ -40,7 +40,7 @@
                 <label class="sr-only" for="range-from">From</label>
                 <input id="range-from" type="date" name="from" value="{{ $range->from->toDateString() }}" max="{{ now()->toDateString() }}" min="2015-01-01" required
                        class="rounded-lg border border-slate-300 px-2.5 py-1.5 font-mono text-xs focus:border-uew-royal focus:ring-2 focus:ring-uew-royal/20 focus:outline-none">
-                <span class="text-xs text-slate-400" aria-hidden="true">to</span>
+                <span class="text-xs text-slate-500" aria-hidden="true">to</span>
                 <label class="sr-only" for="range-to">To</label>
                 <input id="range-to" type="date" name="to" value="{{ $range->to->toDateString() }}" max="{{ now()->toDateString() }}" min="2015-01-01" required
                        class="rounded-lg border border-slate-300 px-2.5 py-1.5 font-mono text-xs focus:border-uew-royal focus:ring-2 focus:ring-uew-royal/20 focus:outline-none">
@@ -110,11 +110,11 @@
                                     @endcan
                                     <p class="text-xs text-slate-500">{{ $row->program->type->label() }} · {{ $row->program->status->label() }}</p>
                                 </td>
-                                <td class="px-3 py-3 text-right font-mono font-semibold">{{ $row->total }}@if ($row->program->capacity)<span class="text-slate-400">/{{ $row->program->capacity }}</span>@endif</td>
+                                <td class="px-3 py-3 text-right font-mono font-semibold">{{ $row->total }}@if ($row->program->capacity)<span class="text-slate-500">/{{ $row->program->capacity }}</span>@endif</td>
                                 <td class="px-3 py-3 text-right font-mono">{{ $row->pending }}</td>
                                 <td class="px-3 py-3 text-right font-mono text-emerald-700">{{ $row->approved }}</td>
                                 <td class="px-3 py-3 text-right font-mono text-slate-500">{{ $row->rejected }}</td>
-                                <td class="w-44 px-5 py-3">@if ($row->acceptance !== null)<x-ui.progress :value="$row->acceptance" tone="green" />@else<span class="text-xs text-slate-400">—</span>@endif</td>
+                                <td class="w-44 px-5 py-3">@if ($row->acceptance !== null)<x-ui.progress :value="$row->acceptance" tone="green" />@else<span class="text-xs text-slate-500">—</span>@endif</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -160,7 +160,7 @@
                 <ol class="divide-y divide-slate-100">
                     @foreach ($leaders as $i => $leader)
                         <li class="flex items-center gap-3 px-5 py-3">
-                            <span class="w-5 font-mono text-xs font-bold text-slate-400">{{ $i + 1 }}</span>
+                            <span class="w-5 font-mono text-xs font-bold text-slate-500">{{ $i + 1 }}</span>
                             <span class="min-w-0 flex-1">
                                 @can('members.manage')
                                     <a href="{{ route('workspace.members.show', $leader->user) }}" class="block truncate text-sm font-semibold text-slate-900 hover:text-uew-royal">{{ $leader->user->name }}</a>
@@ -239,7 +239,7 @@
                         @foreach ($budgets as $row)
                             <tr>
                                 <td class="px-5 py-3 font-semibold text-slate-900">{{ $row->program->title }}</td>
-                                <td class="px-3 py-3 text-right font-mono">{{ $row->reporting }}<span class="text-slate-400">/{{ $row->accepted }}</span></td>
+                                <td class="px-3 py-3 text-right font-mono">{{ $row->reporting }}<span class="text-slate-500">/{{ $row->accepted }}</span></td>
                                 <td class="px-3 py-3 text-right font-mono text-slate-500">{{ $row->funding ? number_format($row->funding) : '—' }}</td>
                                 <td class="px-3 py-3 text-right font-mono">{{ number_format($row->received) }}</td>
                                 <td class="px-3 py-3 text-right font-mono font-semibold">{{ number_format($row->spent) }}</td>
@@ -249,7 +249,7 @@
                                         <x-ui.progress :value="min(100, $row->burn)" :tone="$row->burn > 100 ? 'red' : 'royal'" />
                                         <p @class(['mt-1 font-mono text-[11px]', 'font-semibold text-red-600' => $row->burn > 100, 'text-slate-500' => $row->burn <= 100])>{{ $row->burn }}%</p>
                                     @else
-                                        <span class="text-xs text-slate-400">No reports</span>
+                                        <span class="text-xs text-slate-500">No reports</span>
                                     @endif
                                 </td>
                             </tr>

@@ -65,8 +65,9 @@ This notice explains how the University of Education, Winneba (UEW) Innovation H
 ## What we collect
 
 - **Account details:** name, e-mail address, password (stored as a one-way hash)
-- **Profile details:** phone number, affiliation, institution, department, short bio and interests
-- **Applications:** your answers and any documents you upload
+- **Profile details:** phone number, gender, date of birth, region, affiliation, institution, department, education level, disability status (optional), short bio and interests
+- **Applications:** your answers, any documents you upload, and a copy of your profile details at the time you submit
+- **Programme participation:** messages with Hub staff, progress and budget reports, badges and XP
 - **Enquiries:** messages sent through the contact form
 - **Technical data:** IP address and sign-in times, kept for security
 
@@ -76,7 +77,9 @@ To run your account, assess applications, contact you about decisions, send anno
 
 ## Who can see it
 
-Only Hub staff whose role requires it. Applications are visible to the review panel. We do not sell your data.
+Only Hub staff whose role requires it. Applications are visible to the review panel, who do **not** see your gender or disability status. Gender, age, region and disability are reported to funders only as anonymous totals. If you switch on the community page, your name, affiliation, institution, bio, XP and badges become public; you can switch it off at any time. We do not sell your data.
+## Cookies
+We use only the cookies needed to run the site: a session cookie that keeps you signed in and a security cookie that protects forms against forgery. There are no advertising or analytics cookies.
 
 ## How long we keep it
 

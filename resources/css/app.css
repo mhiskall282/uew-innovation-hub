@@ -28,7 +28,7 @@
     --color-uew-gold: #f59e0b;
     --color-uew-gold-light: #fbbf24;
     --color-uew-gold-dark: #b45309;
-    --color-uew-canvas: #f4f7fb;
+    --color-uew-canvas: #f8fafc; /* slate-500 text on it meets 4.5:1 */
     /* Crest red from the official UEW mark, used sparingly as an accent. */
     --color-uew-red: #e31e24;
 
@@ -50,6 +50,38 @@
 
     [x-cloak] {
         display: none !important;
+    }
+
+    /*
+     * Grid and flex children default to min-width: auto, so a wide table inside
+     * an overflow-x-auto wrapper would still stretch its column and make the
+     * whole page scroll sideways on phones. Utilities (min-w-*) still override.
+     */
+    .grid > * {
+        min-width: 0;
+    }
+
+    /*
+     * Absolutely positioned descendants (e.g. sr-only labels in table cells)
+     * would otherwise escape a horizontal scroller and widen the page.
+     */
+    .overflow-x-auto,
+    .overflow-x-scroll {
+        position: relative;
+    }
+
+    /* WCAG 2.3.3: honour the operating system's reduced-motion setting. */
+    @media (prefers-reduced-motion: reduce) {
+        html {
+            scroll-behavior: auto;
+        }
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
     }
 }
 

@@ -42,7 +42,7 @@
                         <span class="min-w-0">
                             <span class="block text-[13px] font-semibold text-slate-900">{{ $notification->data['title'] ?? 'Notification' }}</span>
                             <span class="mt-0.5 line-clamp-2 block text-xs text-slate-600">{{ $notification->data['body'] ?? '' }}</span>
-                            <span class="mt-1 block text-[11px] text-slate-400">{{ $notification->created_at->diffForHumans() }}</span>
+                            <span class="mt-1 block text-[11px] text-slate-500">{{ $notification->created_at->diffForHumans() }}</span>
                         </span>
                     </a>
                 </li>

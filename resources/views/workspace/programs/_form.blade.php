@@ -86,8 +86,8 @@
                                             <input type="checkbox" :name="`fields[${i}][required]`" value="1" x-model="field.required" class="size-4 rounded border-slate-300 text-uew-navy focus:ring-uew-royal"> Required
                                         </label>
                                         <div class="flex items-center gap-1">
-                                            <button type="button" @click="move(i, -1)" class="rounded p-1 text-slate-400 hover:bg-white hover:text-slate-700" title="Move up"><x-ui.icon name="chevron-down" class="size-4 rotate-180" /></button>
-                                            <button type="button" @click="move(i, 1)" class="rounded p-1 text-slate-400 hover:bg-white hover:text-slate-700" title="Move down"><x-ui.icon name="chevron-down" class="size-4" /></button>
+                                            <button type="button" @click="move(i, -1)" class="rounded p-1 text-slate-500 hover:bg-white hover:text-slate-700" title="Move up"><x-ui.icon name="chevron-down" class="size-4 rotate-180" /></button>
+                                            <button type="button" @click="move(i, 1)" class="rounded p-1 text-slate-500 hover:bg-white hover:text-slate-700" title="Move down"><x-ui.icon name="chevron-down" class="size-4" /></button>
                                             <button type="button" @click="remove(i)" class="rounded p-1 text-red-400 hover:bg-red-50 hover:text-red-600" title="Remove question"><x-ui.icon name="trash" class="size-4" /></button>
                                         </div>
                                     </div>

@@ -14,7 +14,7 @@
 
             @foreach ($elements as $element)
                 @if (is_string($element))
-                    <span class="px-2 text-xs text-slate-400">{{ $element }}</span>
+                    <span class="px-2 text-xs text-slate-500">{{ $element }}</span>
                 @endif
 
                 @if (is_array($element))

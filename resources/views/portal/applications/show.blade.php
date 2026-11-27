@@ -26,7 +26,7 @@
                             @php $done = $current >= $i + 1; @endphp
                             <li class="text-center">
                                 <div @class(['h-1.5 rounded-full', 'bg-gradient-to-r from-uew-royal to-uew-purple' => $done, 'bg-slate-200' => ! $done])></div>
-                                <p @class(['mt-2 text-[11px] font-semibold', 'text-uew-navy' => $done, 'text-slate-400' => ! $done])>{{ $i === 3 && $application->status->isFinal() ? $application->status->label() : $label }}</p>
+                                <p @class(['mt-2 text-[11px] font-semibold', 'text-uew-navy' => $done, 'text-slate-500' => ! $done])>{{ $i === 3 && $application->status->isFinal() ? $application->status->label() : $label }}</p>
                             </li>
                         @endforeach
                     </ol>

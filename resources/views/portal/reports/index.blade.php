@@ -29,7 +29,7 @@
                                             <p class="font-mono text-[11px] text-slate-500">{{ $report->reference }}</p>
                                         </td>
                                         <td class="hidden px-3 py-3 text-slate-600 md:table-cell">{{ $report->application?->program?->title }}</td>
-                                        <td class="px-3 py-3 text-right font-mono">{{ number_format((float) $report->budget_spent, 2) }} <span class="text-slate-400">/ {{ number_format((float) $report->budget_received, 2) }}</span></td>
+                                        <td class="px-3 py-3 text-right font-mono">{{ number_format((float) $report->budget_spent, 2) }} <span class="text-slate-500">/ {{ number_format((float) $report->budget_received, 2) }}</span></td>
                                         <td class="px-5 py-3"><x-ui.badge :tone="$report->status->tone()" dot>{{ $report->status->label() }}</x-ui.badge></td>
                                     </tr>
                                 @endforeach

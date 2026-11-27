@@ -41,6 +41,6 @@ class SecureDemoAccountsTest extends TestCase
         $this->assertFalse(SecureDemoAccounts::isStrong('password'));
         $this->assertFalse(SecureDemoAccounts::isStrong('alllowercase1234'));
         $this->assertFalse(SecureDemoAccounts::isStrong(null));
-        $this->assertTrue(SecureDemoAccounts::isStrong('Uew-H5KM1PNkpEk5Gi'));
+        $this->assertTrue(SecureDemoAccounts::isStrong('Example-Only-Pass-42'));
     }
 }

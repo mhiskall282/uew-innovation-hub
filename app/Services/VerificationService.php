@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Mail\TemplatedMail;
 use App\Models\User;
 use App\Models\VerificationCode;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
@@ -81,11 +82,31 @@ final class VerificationService
      */
     public function verify(User $user, string $purpose, string $code): void
     {
+        // Row lock: parallel guesses are counted one after another, so no
+        // request can slip past MAX_ATTEMPTS or reuse a code being consumed.
+        $error = DB::transaction(function () use ($user, $purpose, $code) {
+            try {
+                $this->check($user, $purpose, $code);
+
+                return null;
+            } catch (ValidationException $e) {
+                return $e; // commit the attempt count before failing
+            }
+        });
+
+        if ($error) {
+            throw $error;
+        }
+    }
+
+    private function check(User $user, string $purpose, string $code): void
+    {
         $record = VerificationCode::query()
             ->where('user_id', $user->id)
             ->where('purpose', $purpose)
             ->whereNull('consumed_at')
             ->latest('id')
+            ->lockForUpdate()
             ->first();
 
         $fail = fn (string $message) => throw ValidationException::withMessages(['code' => $message]);

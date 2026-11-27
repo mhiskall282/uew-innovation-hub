@@ -13,7 +13,7 @@
             <div class="space-y-5">
                 <x-ui.field label="Web address" for="slug" name="slug" hint="Lowercase letters, numbers and hyphens.">
                     <div class="flex items-center rounded-lg border border-slate-300 bg-white text-sm shadow-xs focus-within:border-uew-royal focus-within:ring-2 focus-within:ring-uew-royal/20">
-                        <span class="pl-3 text-slate-400">{{ parse_url(url('/'), PHP_URL_HOST) }}/</span>
+                        <span class="pl-3 text-slate-500">{{ parse_url(url('/'), PHP_URL_HOST) }}/</span>
                         <input id="slug" name="slug" value="{{ old('slug', $page->slug) }}" class="block w-full rounded-lg border-0 bg-transparent py-2 pr-3 pl-0.5 text-sm focus:ring-0 focus:outline-none" placeholder="about">
                     </div>
                 </x-ui.field>

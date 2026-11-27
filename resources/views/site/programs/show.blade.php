@@ -46,7 +46,7 @@
                             <li class="flex items-start gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm">
                                 <span class="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-uew-navy/10 font-mono text-[11px] font-bold text-uew-navy">{{ $loop->iteration }}</span>
                                 <span class="flex-1 text-slate-800">{{ $field['label'] }} @if ($field['required'])<span class="text-red-500">*</span>@endif</span>
-                                <span class="shrink-0 text-xs text-slate-400">{{ \App\Support\FormSchema::TYPES[$field['type']] ?? '' }}</span>
+                                <span class="shrink-0 text-xs text-slate-500">{{ \App\Support\FormSchema::TYPES[$field['type']] ?? '' }}</span>
                             </li>
                         @endforeach
                     </ol>

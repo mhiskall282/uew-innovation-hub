@@ -11,7 +11,7 @@
             <div class="relative">
                 <input id="password" name="password" :type="show ? 'text' : 'password'" type="password" required autocomplete="current-password"
                        class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 pr-10 text-sm text-slate-900 shadow-xs focus:border-uew-royal focus:ring-2 focus:ring-uew-royal/20 focus:outline-none">
-                <button type="button" @click="show = ! show" class="absolute inset-y-0 right-0 flex items-center px-3 text-slate-400 hover:text-slate-600" :aria-label="show ? 'Hide password' : 'Show password'">
+                <button type="button" @click="show = ! show" class="absolute inset-y-0 right-0 flex items-center px-3 text-slate-500 hover:text-slate-600" :aria-label="show ? 'Hide password' : 'Show password'">
                     <x-ui.icon name="eye" class="size-4" x-show="! show" />
                     <x-ui.icon name="eye-off" class="size-4" x-show="show" x-cloak />
                 </button>

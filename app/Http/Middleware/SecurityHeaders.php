@@ -53,6 +53,14 @@ final class SecurityHeaders
             $headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
         }
 
+        // Keep test sites and private areas out of search engines. This is not
+        // access control (every private route also requires sign-in).
+        $private = $request->is('workspace', 'workspace/*', 'portal', 'portal/*', 'notifications*', 'onboarding', 'verify-email*',
+            'sign-in', 'sign-up', 'forgot-password', 'reset-password', 'unsubscribe/*', 'documents/*', 'programmes/*/apply');
+        if ($private || ! config('hub.search_indexing')) {
+            $headers->set('X-Robots-Tag', 'noindex, nofollow');
+        }
+
         return $response;
     }
 }

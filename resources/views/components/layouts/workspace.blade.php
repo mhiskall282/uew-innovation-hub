@@ -89,7 +89,7 @@
         <nav class="flex-1 space-y-5 overflow-y-auto px-3 py-5">
             @foreach ($groups as $group => $items)
                 <div>
-                    <p class="mb-1.5 px-3 font-mono text-[10px] font-bold tracking-widest text-slate-500 uppercase" x-show="! collapsed">{{ $group }}</p>
+                    <p class="mb-1.5 px-3 font-mono text-[10px] font-bold tracking-widest text-slate-400 uppercase" x-show="! collapsed">{{ $group }}</p>
                     <ul class="space-y-0.5">
                         @foreach ($items as $item)
                             @php $active = request()->routeIs($item['match']); @endphp
@@ -135,7 +135,7 @@
                     </button>
                 </form>
             </div>
-            <button type="button" @click="collapsed = ! collapsed" class="mt-2 hidden w-full items-center justify-center gap-2 rounded-lg py-1.5 text-[11px] font-semibold text-slate-500 hover:text-slate-300 lg:flex">
+            <button type="button" @click="collapsed = ! collapsed" class="mt-2 hidden w-full items-center justify-center gap-2 rounded-lg py-1.5 text-[11px] font-semibold text-slate-400 hover:text-slate-300 lg:flex">
                 <x-ui.icon name="chevron-double-left" class="size-4 transition-transform" ::class="collapsed && 'rotate-180'" />
                 <span x-show="! collapsed">Collapse</span>
             </button>
@@ -176,11 +176,11 @@
                             <x-ui.badge class="mt-1.5" :tone="$user->role->tone()" size="xs">{{ $user->role->label() }}</x-ui.badge>
                         </div>
                         <div class="py-1 text-sm">
-                            <a href="{{ route('workspace.profile.edit') }}" role="menuitem" class="flex items-center gap-2.5 px-4 py-2 text-slate-700 hover:bg-slate-50"><x-ui.icon name="user" class="size-4 text-slate-400" /> Account settings</a>
+                            <a href="{{ route('workspace.profile.edit') }}" role="menuitem" class="flex items-center gap-2.5 px-4 py-2 text-slate-700 hover:bg-slate-50"><x-ui.icon name="user" class="size-4 text-slate-500" /> Account settings</a>
                             @can('settings.manage')
-                                <a href="{{ route('workspace.settings.edit') }}" role="menuitem" class="flex items-center gap-2.5 px-4 py-2 text-slate-700 hover:bg-slate-50"><x-ui.icon name="cog" class="size-4 text-slate-400" /> Site settings</a>
+                                <a href="{{ route('workspace.settings.edit') }}" role="menuitem" class="flex items-center gap-2.5 px-4 py-2 text-slate-700 hover:bg-slate-50"><x-ui.icon name="cog" class="size-4 text-slate-500" /> Site settings</a>
                             @endcan
-                            <a href="{{ route('site.home') }}" target="_blank" rel="noopener" role="menuitem" class="flex items-center gap-2.5 px-4 py-2 text-slate-700 hover:bg-slate-50"><x-ui.icon name="globe" class="size-4 text-slate-400" /> View public site</a>
+                            <a href="{{ route('site.home') }}" target="_blank" rel="noopener" role="menuitem" class="flex items-center gap-2.5 px-4 py-2 text-slate-700 hover:bg-slate-50"><x-ui.icon name="globe" class="size-4 text-slate-500" /> View public site</a>
                         </div>
                         <form method="POST" action="{{ route('logout') }}" class="border-t border-slate-100 py-1">
                             @csrf
@@ -210,7 +210,7 @@
             {{ $slot }}
         </main>
 
-        <footer class="border-t border-slate-200 px-6 py-4 text-center text-[11px] text-slate-400">
+        <footer class="border-t border-slate-200 px-6 py-4 text-center text-[11px] text-slate-500">
             UEW Innovation Hub workspace · Authorised staff only · Activity is recorded in the audit log
         </footer>
     </div>

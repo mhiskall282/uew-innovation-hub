@@ -6,7 +6,7 @@
                 @if ($activeType)<input type="hidden" name="type" value="{{ $activeType }}">@endif
                 <label class="relative flex-1">
                     <span class="sr-only">Search publications</span>
-                    <x-ui.icon name="search" class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400" />
+                    <x-ui.icon name="search" class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-500" />
                     <input type="search" name="search" value="{{ $search }}" placeholder="Search by title, author or journal"
                            class="block w-full rounded-lg border border-slate-300 bg-white py-2.5 pr-3 pl-9 text-sm focus:border-uew-royal focus:ring-2 focus:ring-uew-royal/20 focus:outline-none">
                 </label>

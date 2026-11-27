@@ -21,6 +21,7 @@ class PageController extends Controller
         'projects', 'publications', 'news', 'partners', 'contact', 'programmes', 'programs', 'apply', 'track',
         'sign-in', 'sign-up', 'register', 'login', 'logout', 'verify-email', 'forgot-password', 'reset-password',
         'onboarding', 'portal', 'workspace', 'api', 'documents', 'unsubscribe', 'up', 'build', 'images',
+        'community', 'notifications', 'signin', 'signup', 'admin', 'news-and-blogs',
     ];
 
     public function __construct(private readonly AuditLogger $audit) {}

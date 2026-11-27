@@ -14,7 +14,7 @@
     <section class="mx-auto max-w-7xl px-6 py-10">
         {{-- Tabs --}}
         <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200">
-            <nav class="-mb-px flex gap-6" aria-label="Programme status">
+            <nav class="-mb-px flex gap-4 overflow-x-auto sm:gap-6" aria-label="Programme status">
                 @foreach (['open' => 'Open now', 'upcoming' => 'Opening soon', 'closed' => 'Closed'] as $key => $label)
                     <a href="{{ route('site.programs.index', array_filter(['tab' => $key, 'type' => $type?->value])) }}"
                        @class(['inline-flex items-center gap-2 border-b-2 px-1 pb-3 text-sm font-semibold', 'border-uew-navy text-uew-navy' => $tab === $key, 'border-transparent text-slate-500 hover:text-slate-800' => $tab !== $key])

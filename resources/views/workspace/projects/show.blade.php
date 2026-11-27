@@ -92,7 +92,7 @@
                     @forelse ($history as $entry)
                         <li class="px-5 py-3">
                             <p class="text-xs text-slate-700">{{ $entry->description }}</p>
-                            <p class="mt-0.5 text-[11px] text-slate-400">{{ $entry->user?->name ?? 'System' }} · <time datetime="{{ $entry->created_at->toIso8601String() }}">{{ $entry->created_at->format('j M Y, H:i') }}</time></p>
+                            <p class="mt-0.5 text-[11px] text-slate-500">{{ $entry->user?->name ?? 'System' }} · <time datetime="{{ $entry->created_at->toIso8601String() }}">{{ $entry->created_at->format('j M Y, H:i') }}</time></p>
                             @if (! empty($entry->properties))
                                 <details class="mt-1.5 text-[11px] text-slate-500">
                                     <summary class="cursor-pointer font-semibold text-uew-royal">{{ count($entry->properties) }} {{ Str::plural('field', count($entry->properties)) }} changed</summary>

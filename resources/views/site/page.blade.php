@@ -5,7 +5,7 @@
             @if ($page->summary)
                 <p class="mt-4 text-lg leading-relaxed text-slate-600">{{ $page->summary }}</p>
             @endif
-            <p class="mt-5 text-xs text-slate-400">Last updated {{ $page->updated_at->format('j F Y') }}</p>
+            <p class="mt-5 text-xs text-slate-500">Last updated {{ $page->updated_at->format('j F Y') }}</p>
         </div>
     </header>
     <article class="prose-uew mx-auto max-w-3xl px-6 py-12">

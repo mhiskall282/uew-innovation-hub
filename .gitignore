@@ -31,3 +31,8 @@ yarn-error.log
 # Local QA artefacts
 /storage/shots/
 /storage/*.ps1
+/database/e2e.sqlite
+/test-results/
+/playwright-report/
+/storage/coverage*
+/storage/pw-install.log

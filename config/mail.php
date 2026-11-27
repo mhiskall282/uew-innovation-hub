@@ -115,4 +115,10 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    /*
+    | Non-production only: deliver every message to this address instead of the
+    | real recipients (see AppServiceProvider). Use for local and staging tests.
+    */
+    'always_to' => env('MAIL_ALWAYS_TO'),
+
 ];

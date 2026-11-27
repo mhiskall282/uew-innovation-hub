@@ -29,7 +29,7 @@ final class SettingsService
         return [
             // Contact
             'contact_email' => config('hub.contact_email'),
-            'contact_phone' => '+233 (0) 20 000 0000',
+            'contact_phone' => null, // hidden until the Hub sets a real number in Site settings
             'address' => config('hub.address'),
             'office_hours' => 'Monday to Friday, 8:00 to 17:00',
             'map_url' => 'https://maps.google.com/?q=University+of+Education+Winneba',

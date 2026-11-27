@@ -39,7 +39,7 @@
                                         @unless ($notification->read_at)<span class="mt-1.5 size-2 shrink-0 rounded-full bg-uew-royal" aria-label="Unread"></span>@endunless
                                     </span>
                                     <span class="mt-0.5 block text-sm text-slate-600">{{ $notification->data['body'] ?? '' }}</span>
-                                    <span class="mt-1 block text-xs text-slate-400"><time datetime="{{ $notification->created_at->toIso8601String() }}">{{ $notification->created_at->format('j M Y, H:i') }}</time> · {{ $notification->created_at->diffForHumans() }}</span>
+                                    <span class="mt-1 block text-xs text-slate-500"><time datetime="{{ $notification->created_at->toIso8601String() }}">{{ $notification->created_at->format('j M Y, H:i') }}</time> · {{ $notification->created_at->diffForHumans() }}</span>
                                 </span>
                             </a>
                         </li>

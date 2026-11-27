@@ -18,7 +18,7 @@
         @if ($activeStatus)<input type="hidden" name="status" value="{{ $activeStatus->value }}">@endif
         <label class="relative flex-1">
             <span class="sr-only">Search</span>
-            <x-ui.icon name="search" class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400" />
+            <x-ui.icon name="search" class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-500" />
             <input type="search" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Reference, applicant, email or title"
                    class="block w-full rounded-lg border border-slate-300 py-2 pr-3 pl-9 text-sm focus:border-uew-royal focus:ring-2 focus:ring-uew-royal/20 focus:outline-none">
         </label>
@@ -55,7 +55,7 @@
                                 <td class="hidden px-3 py-3.5 text-right font-mono text-xs whitespace-nowrap text-slate-700 md:table-cell">{{ Format::money($application->funding_requested, 0) }}</td>
                                 <td class="px-3 py-3.5">
                                     <x-ui.badge :tone="$application->status->tone()" dot>{{ $application->status->label() }}</x-ui.badge>
-                                    @if ($application->reviewer)<p class="mt-1 text-[11px] text-slate-400">by {{ $application->reviewer->name }}</p>@endif
+                                    @if ($application->reviewer)<p class="mt-1 text-[11px] text-slate-500">by {{ $application->reviewer->name }}</p>@endif
                                 </td>
                                 <td class="hidden px-5 py-3.5 text-xs whitespace-nowrap text-slate-500 lg:table-cell" title="{{ $application->created_at->format('j M Y, H:i') }}">{{ $application->created_at->diffForHumans() }}</td>
                             </tr>

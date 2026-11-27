@@ -31,6 +31,21 @@
     <link rel="canonical" href="{{ url()->current() }}">
     <link rel="icon" href="{{ asset('images/innovation_hub_logo.jpg') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @if (request()->routeIs('site.home'))
+        @php
+            $organisation = [
+                '@context' => 'https://schema.org',
+                '@type' => 'Organization',
+                'name' => 'UEW Innovation Hub',
+                'url' => route('site.home'),
+                'logo' => asset('images/innovation_hub_logo.jpg'),
+                'email' => $s['contact_email'],
+                'parentOrganization' => ['@type' => 'CollegeOrUniversity', 'name' => 'University of Education, Winneba', 'url' => 'https://uew.edu.gh'],
+                'sameAs' => array_values($socials),
+            ];
+        @endphp
+        <script type="application/ld+json">{!! json_encode($organisation, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) !!}</script>
+    @endif
 </head>
 <body class="flex min-h-screen flex-col bg-white font-sans text-slate-800 antialiased selection:bg-uew-royal selection:text-white">
     <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:shadow-lg">Skip to content</a>

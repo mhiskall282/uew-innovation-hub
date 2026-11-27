@@ -38,6 +38,20 @@ return [
     */
     'seed_password' => env('SEED_PASSWORD', 'password'),
 
+    /*
+    | Refuse sign-in with well-known default passwords ("password", "secret"...).
+    | Set BLOCK_DEFAULT_PASSWORDS=true on any hosted site once SEED_PASSWORD is
+    | set (the boot-time `hub:secure-demo-accounts` then moves demo accounts to
+    | it). Opt-in so switching it on never locks testers out unannounced.
+    */
+    'block_default_passwords' => (bool) env('BLOCK_DEFAULT_PASSWORDS', false),
+
+    /*
+    | Allow search engines to index the public site. Off by default so test and
+    | staging sites are never indexed; set SEARCH_INDEXING=true for the launch.
+    */
+    'search_indexing' => (bool) env('SEARCH_INDEXING', false),
+
     /* Allow `db:seed` to create demo data when APP_ENV=production (demo sites only). */
     'seed_demo_data' => (bool) env('SEED_DEMO_DATA', false),
 

@@ -100,7 +100,7 @@
                         <span class="flex size-11 items-center justify-center rounded-xl bg-uew-navy text-uew-gold-light">
                             <x-ui.icon :name="$areaIcons[$area] ?? 'sparkles'" class="size-5" />
                         </span>
-                        <span class="font-mono text-xs font-semibold text-slate-400">{{ $count }} {{ Str::plural('project', $count) }}</span>
+                        <span class="font-mono text-xs font-semibold text-slate-500">{{ $count }} {{ Str::plural('project', $count) }}</span>
                     </div>
                     <h3 class="mt-5 font-bold text-slate-900 group-hover:text-uew-royal">{{ $area }}</h3>
                     <p class="mt-1.5 text-sm leading-relaxed text-slate-600">{{ $areaCopy[$area] ?? '' }}</p>

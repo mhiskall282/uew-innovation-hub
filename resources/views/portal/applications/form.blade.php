@@ -6,7 +6,7 @@
         // Saved answer first, then the member's profile for questions linked to a profile value.
         $valueFor = fn ($field) => old("answers.{$field['key']}", $answers[$field['key']]
             ?? (! empty($field['prefill']) ? \App\Support\Demographics::prefillValue($member, $field['prefill'], $field['type']) : null));
-        $inputClass = 'block w-full rounded-lg border bg-white px-3 py-2 text-sm text-slate-900 shadow-xs placeholder:text-slate-400 focus:border-uew-royal focus:ring-2 focus:ring-uew-royal/20 focus:outline-none';
+        $inputClass = 'block w-full rounded-lg border bg-white px-3 py-2 text-sm text-slate-900 shadow-xs placeholder:text-slate-500 focus:border-uew-royal focus:ring-2 focus:ring-uew-royal/20 focus:outline-none';
         $maxMb = (int) floor(config('hub.max_upload_kb') / 1024);
     @endphp
 
@@ -131,7 +131,7 @@
                     </div>
                     <p class="mt-4 text-xs text-slate-500">After you submit, answers can no longer be changed. Drafts are not reviewed.</p>
                     @if ($application->exists)
-                        <p class="mt-2 text-xs text-slate-400">Last saved {{ $application->updated_at->diffForHumans() }} · {{ $application->reference }}</p>
+                        <p class="mt-2 text-xs text-slate-500">Last saved {{ $application->updated_at->diffForHumans() }} · {{ $application->reference }}</p>
                     @endif
                 </x-ui.card>
 

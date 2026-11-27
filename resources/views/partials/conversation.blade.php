@@ -9,7 +9,7 @@
                         {{ $message->from_staff ? ($staffView ? ($message->author?->name ?? 'Staff') : 'UEW Innovation Hub') : ($message->author?->name ?? 'Applicant') }}
                     </p>
                     <p class="mt-1 text-sm leading-relaxed whitespace-pre-line">{{ $message->body }}</p>
-                    <p @class(['mt-1.5 text-[10px]', 'text-white/60' => $mine, 'text-slate-400' => ! $mine])><time datetime="{{ $message->created_at->toIso8601String() }}">{{ $message->created_at->format('j M Y, H:i') }}</time></p>
+                    <p @class(['mt-1.5 text-[10px]', 'text-white/60' => $mine, 'text-slate-500' => ! $mine])><time datetime="{{ $message->created_at->toIso8601String() }}">{{ $message->created_at->format('j M Y, H:i') }}</time></p>
                 </div>
             </li>
         @empty

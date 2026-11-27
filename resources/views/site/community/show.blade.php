@@ -35,7 +35,7 @@
                                 <x-ui.badge :tone="$achievement->type->tone()" size="xs">{{ $achievement->type->label() }}</x-ui.badge>
                                 <span class="mt-1 block text-sm font-semibold text-slate-900">{{ $achievement->title }}</span>
                                 @if ($achievement->description)<span class="block text-xs text-slate-600">{{ $achievement->description }}</span>@endif
-                                <span class="mt-0.5 block text-[11px] text-slate-400">{{ $achievement->awarded_at->format('F Y') }} · +{{ $achievement->xp }} XP</span>
+                                <span class="mt-0.5 block text-[11px] text-slate-500">{{ $achievement->awarded_at->format('F Y') }} · +{{ $achievement->xp }} XP</span>
                             </span>
                         </li>
                     @empty
