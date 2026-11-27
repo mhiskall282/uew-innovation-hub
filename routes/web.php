@@ -32,17 +32,25 @@ Route::name('site.')->group(function () {
     Route::get('/community', [Site\CommunityController::class, 'index'])->name('community.index');
     Route::get('/community/{user}', [Site\CommunityController::class, 'show'])->whereNumber('user')->name('community.show');
 
+    Route::get('/gallery', [Site\GalleryController::class, 'index'])->name('gallery.index');
+    Route::get('/gallery/{album}', [Site\GalleryController::class, 'show'])->name('gallery.show');
+
     Route::get('/contact', [Site\ContactController::class, 'create'])->name('contact');
     Route::post('/contact', [Site\ContactController::class, 'store'])->middleware('throttle:contact-messages')->name('contact.store');
 
     Route::get('/documents/projects/{project}/report', [Site\DocumentController::class, 'projectReport'])->name('documents.project-report');
     Route::get('/documents/publications/{publication}', [Site\DocumentController::class, 'publication'])->name('documents.publication');
 
-    Route::get('/unsubscribe/{user}', Site\UnsubscribeController::class)->middleware('signed')->name('unsubscribe');
+    Route::get('/unsubscribe/{user}', [Site\UnsubscribeController::class, 'show'])->middleware('signed')->whereNumber('user')->name('unsubscribe');
+    Route::post('/unsubscribe/{user}', [Site\UnsubscribeController::class, 'store'])->middleware(['signed', 'throttle:20,1'])->whereNumber('user')->name('unsubscribe.store');
 
     Route::get('/robots.txt', [Site\SeoController::class, 'robots'])->name('robots');
     Route::get('/sitemap.xml', [Site\SeoController::class, 'sitemap'])->name('sitemap');
 });
+
+// Gallery photo files (checks the album is published; staff can preview drafts).
+Route::get('/media/photos/{photo}/{size}', [Site\GalleryController::class, 'photo'])
+    ->whereNumber('photo')->whereIn('size', ['large', 'thumb'])->name('media.photo');
 
 // Old URLs.
 Route::permanentRedirect('/news-and-blogs', '/news');
@@ -66,6 +74,15 @@ Route::middleware('guest')->group(function () {
     Route::post('/forgot-password', [Auth\PasswordResetController::class, 'send'])->middleware('throttle:password-codes')->name('password.email');
     Route::get('/reset-password', [Auth\PasswordResetController::class, 'edit'])->name('password.reset');
     Route::post('/reset-password', [Auth\PasswordResetController::class, 'update'])->middleware('throttle:10,1')->name('password.update');
+});
+
+// Buttons in verification and reset e-mails: temporary signed links to one code.
+// GET shows a confirmation page; POST (same signed URL) makes the change.
+Route::middleware(['signed', 'throttle:10,1'])->group(function () {
+    Route::get('/email/verify/{user}/{record}', [Auth\EmailLinkController::class, 'showVerify'])->whereNumber(['user', 'record'])->name('verification.link');
+    Route::post('/email/verify/{user}/{record}', [Auth\EmailLinkController::class, 'verify'])->whereNumber(['user', 'record'])->name('verification.link.store');
+    Route::get('/password/reset/{user}/{record}', [Auth\EmailLinkController::class, 'showReset'])->whereNumber(['user', 'record'])->name('password.link');
+    Route::post('/password/reset/{user}/{record}', [Auth\EmailLinkController::class, 'reset'])->whereNumber(['user', 'record'])->name('password.link.store');
 });
 
 // Common sign-in / sign-up URLs people type or bookmark.
@@ -170,6 +187,8 @@ Route::prefix('workspace')->middleware(['auth', 'active', 'verified.email', 'can
         Route::get('/members/export', [Workspace\MemberController::class, 'export'])->name('members.export');
         Route::get('/members/{member}', [Workspace\MemberController::class, 'show'])->name('members.show');
         Route::patch('/members/{member}/toggle', [Workspace\MemberController::class, 'toggle'])->name('members.toggle');
+        Route::post('/members/{user}/password-reset', [Workspace\AccountEmailController::class, 'passwordReset'])->middleware('throttle:10,1')->name('members.password-reset');
+        Route::post('/members/{user}/verification', [Workspace\AccountEmailController::class, 'verification'])->middleware('throttle:10,1')->name('members.verification');
         Route::post('/members/{member}/achievements', [Workspace\AchievementController::class, 'store'])->name('achievements.store');
         Route::delete('/achievements/{achievement}', [Workspace\AchievementController::class, 'destroy'])->name('achievements.destroy');
     });
@@ -190,6 +209,13 @@ Route::prefix('workspace')->middleware(['auth', 'active', 'verified.email', 'can
     Route::get('/grants/{application:reference_no}/proposal', [Workspace\GrantApplicationController::class, 'proposal'])->name('grants.proposal');
 
     Route::resource('posts', Workspace\PostController::class)->except('show');
+
+    Route::middleware('can:content.draft')->group(function () {
+        Route::resource('albums', Workspace\AlbumController::class)->except('show');
+        Route::post('/albums/{album}/photos', [Workspace\AlbumController::class, 'upload'])->middleware('throttle:20,1')->name('albums.photos.store');
+        Route::put('/albums/{album}/photos', [Workspace\AlbumController::class, 'arrange'])->name('albums.photos.arrange');
+        Route::delete('/albums/{album}/photos/{photo}', [Workspace\AlbumController::class, 'destroyPhoto'])->name('albums.photos.destroy');
+    });
     Route::resource('publications', Workspace\PublicationController::class)->except('show');
     Route::resource('organizations', Workspace\OrganizationController::class)->except('show');
 
@@ -211,6 +237,8 @@ Route::prefix('workspace')->middleware(['auth', 'active', 'verified.email', 'can
 
     // Administration
     Route::patch('/users/{user}/toggle', [Workspace\UserController::class, 'toggle'])->name('users.toggle');
+    Route::post('/users/{user}/password-reset', [Workspace\AccountEmailController::class, 'passwordReset'])->middleware('throttle:10,1')->name('users.password-reset');
+    Route::get('/roles', Workspace\RoleController::class)->middleware('can:users.manage')->name('roles.index');
     Route::resource('users', Workspace\UserController::class)->except('show');
 
     Route::middleware('can:settings.manage')->group(function () {
@@ -241,5 +269,5 @@ Route::prefix('workspace')->middleware(['auth', 'active', 'verified.email', 'can
 */
 
 Route::get('/{page}', Site\PageController::class)
-    ->where('page', '^(?!up$|api$|workspace$|portal$|notifications$|community$)[a-z0-9-]+$')
+    ->where('page', '^(?!up$|api$|workspace$|portal$|notifications$|community$|gallery$|media$|email$|password$)[a-z0-9-]+$')
     ->name('site.page');

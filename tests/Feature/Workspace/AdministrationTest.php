@@ -146,7 +146,10 @@ class AdministrationTest extends TestCase
 
         auth()->logout();
         $this->get(route('site.unsubscribe', $match))->assertForbidden(); // unsigned
-        $this->get(URL::signedRoute('site.unsubscribe', $match))->assertOk();
+        // Opening the link only asks for confirmation (mail scanners pre-open links).
+        $this->get(URL::signedRoute('site.unsubscribe', $match))->assertOk()->assertSee('Stop announcement e-mails?');
+        $this->assertTrue($match->fresh()->marketing_opt_in);
+        $this->post(URL::signedRoute('site.unsubscribe.store', $match))->assertOk()->assertSee('You have been unsubscribed');
         $this->assertFalse($match->fresh()->marketing_opt_in);
     }
 

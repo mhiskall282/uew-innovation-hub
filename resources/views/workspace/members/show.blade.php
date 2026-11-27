@@ -2,6 +2,14 @@
     <x-ui.page-header :title="$member->name" :description="$member->email" :back="route('workspace.members.index')" back-label="Members">
         <x-slot:actions>
             <x-ui.badge :tone="$member->is_active ? 'green' : 'red'" size="md" dot>{{ $member->is_active ? 'Active' : 'Suspended' }}</x-ui.badge>
+            @if (! $member->email_verified_at)
+                <x-ui.confirm-form :action="route('workspace.members.verification', $member)" method="POST"
+                    :message="'Send a new verification e-mail to ' . $member->email . '?'" label="Resend verification" variant="secondary" icon="mail" />
+            @endif
+            @if ($member->is_active)
+                <x-ui.confirm-form :action="route('workspace.members.password-reset', $member)" method="POST"
+                    :message="'Send a password-reset e-mail to ' . $member->email . '?'" label="Send password reset" variant="secondary" icon="lock" />
+            @endif
             <x-ui.confirm-form :action="route('workspace.members.toggle', $member)" method="PATCH"
                 :message="$member->is_active ? 'Suspend ' . $member->name . '? They will be signed out and cannot sign in.' : 'Restore access for ' . $member->name . '?'"
                 :label="$member->is_active ? 'Suspend account' : 'Restore account'" :variant="$member->is_active ? 'danger-ghost' : 'secondary'" icon="power" />

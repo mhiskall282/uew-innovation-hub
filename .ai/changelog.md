@@ -4,6 +4,22 @@ All notable changes to the UEW Innovation Hub Enterprise platform will be docume
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.4.0] - 2026-11-27
+
+### Added
+- Event photo gallery: albums with multi-photo upload (re-encoded with GD, EXIF/GPS stripped, 1600px and 640px), captions, ordering and cover; public `/gallery` with an accessible lightbox; "Moments from the Hub" on the homepage; gallery entries in the sitemap. Interns draft, officers publish.
+- Roles & permissions page (Hub Director): the full matrix in plain language.
+- Admin-sent password-reset and verification e-mails (no admin ever sets or sees a password).
+- Signed one-click links in verification and reset e-mails (confirm-on-POST, single use, expire with the code); RFC 8058 one-click unsubscribe.
+- E-mails redesigned in the official UEW crest colours (blue #25267a, red #e41824) with a hosted crest image.
+
+### Changed
+- Nobody can change their own role.
+
+### Fixed
+- E-mail images missing in some clients (attached images replaced with a hosted HTTPS image).
+- Malformed photo metadata can no longer crash an upload.
+
 ## [1.3.0] - 2026-11-24
 
 ### Added

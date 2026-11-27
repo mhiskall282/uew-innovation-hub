@@ -121,4 +121,11 @@ return [
     */
     'always_to' => env('MAIL_ALWAYS_TO'),
 
+    /*
+    | Public HTTPS base URL for images in e-mails (the crest). Defaults to
+    | APP_URL. Set it to the live site when sending from a local machine, so
+    | recipients can load images.
+    */
+    'asset_url' => env('MAIL_ASSET_URL'),
+
 ];

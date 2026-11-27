@@ -1,5 +1,8 @@
 {{-- Expects $user, $roles --}}
-@php $selectedRole = old('role', $user->role?->value ?? 'viewer'); @endphp
+@php
+    $selectedRole = old('role', $user->role?->value ?? 'viewer');
+    $isSelf = $user->exists && auth()->user()?->is($user);
+@endphp
 <div class="grid gap-6 xl:grid-cols-3">
     <div class="space-y-6 xl:col-span-2">
         <x-ui.card title="Profile">
@@ -13,9 +16,10 @@
         <x-ui.card title="Role" description="Choose the least access this person needs.">
             <fieldset class="grid gap-3 sm:grid-cols-2">
                 <legend class="sr-only">Role</legend>
+                @if ($isSelf)<p class="sm:col-span-2 rounded-lg bg-amber-50 px-3 py-2 text-xs font-medium text-amber-900 ring-1 ring-amber-200 ring-inset">You can't change your own role. Another Hub Director can.</p>@endif
                 @foreach ($roles as $role)
                     <label class="flex cursor-pointer gap-3 rounded-xl border border-slate-200 p-4 has-[:checked]:border-uew-royal has-[:checked]:bg-blue-50/50">
-                        <input type="radio" name="role" value="{{ $role->value }}" @checked($selectedRole === $role->value) class="mt-0.5 size-4 border-slate-300 text-uew-navy focus:ring-uew-royal">
+                        <input type="radio" name="role" value="{{ $role->value }}" @checked($selectedRole === $role->value) @disabled($isSelf && $selectedRole !== $role->value) class="mt-0.5 size-4 border-slate-300 text-uew-navy focus:ring-uew-royal">
                         <span>
                             <x-ui.badge :tone="$role->tone()">{{ $role->label() }}</x-ui.badge>
                             <span class="mt-1.5 block text-xs leading-relaxed text-slate-500">{{ $role->description() }}</span>

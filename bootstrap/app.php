@@ -12,6 +12,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Exceptions\InvalidSignatureException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -31,6 +32,10 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->appendToGroup('web', SecurityHeaders::class);
+
+        // RFC 8058 one-click unsubscribe: mail providers POST without a CSRF
+        // token. The signed URL authorises these requests instead.
+        $middleware->validateCsrfTokens(except: ['unsubscribe/*']);
         $middleware->appendToGroup('api', SecurityHeaders::class);
 
         // Behind Render/Vercel/any load balancer set TRUSTED_PROXIES=* so
@@ -46,6 +51,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         // The public API always answers in the same JSON envelope.
         $exceptions->shouldRenderJsonWhen(fn (Request $request) => $request->is('api/*') || $request->expectsJson());
+
+        // Expired, tampered or already-replaced e-mail links get a helpful page, not a bare 403.
+        $exceptions->render(function (InvalidSignatureException $e, Request $request) {
+            return $request->is('api/*') ? null : response()->view('auth.link-expired', [], 403);
+        });
 
         $exceptions->render(function (Throwable $e, Request $request) {
             if (! $request->is('api/*')) {

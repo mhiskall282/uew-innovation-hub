@@ -55,6 +55,7 @@ class SendBroadcast implements ShouldQueue
                     footerNote: 'You receive this because you asked for announcements from the UEW Innovation Hub. <a href="'.e($unsubscribe).'">Unsubscribe</a> or change your preferences in your account.',
                     customSubject: $broadcast->subject,
                     customBody: $broadcast->body,
+                    unsubscribeUrl: $unsubscribe,
                 ));
                 $sent++;
             });

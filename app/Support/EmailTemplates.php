@@ -35,18 +35,18 @@ final class EmailTemplates
                 'description' => 'Sent when someone creates an account, or asks for a new code.',
                 'group' => 'Accounts',
                 'subject' => 'Your verification code: {{code}}',
-                'body' => "Hello {{first_name}},\n\nUse this code to verify your e-mail address for your {{site_name}} account:\n\n# {{code}}\n\nThe code expires in {{minutes}} minutes. If you did not create an account, you can ignore this e-mail.",
+                'body' => "Hello {{first_name}},\n\nConfirm your e-mail address to finish setting up your {{site_name}} account. Press the button below, or enter this code on the verification page:\n\n# {{code}}\n\nThe code and the button work once and expire in {{minutes}} minutes. If you did not create an account, you can ignore this e-mail.",
                 'placeholders' => $common + ['code' => 'Six-digit code', 'minutes' => 'Minutes until the code expires'],
-                'action' => null,
+                'action' => 'Verify my e-mail',
             ],
             'password_reset_code' => [
                 'name' => 'Password reset code',
                 'description' => 'Sent when someone uses "Forgot password".',
                 'group' => 'Accounts',
                 'subject' => 'Your password reset code: {{code}}',
-                'body' => "Hello {{first_name}},\n\nWe received a request to reset the password for your {{site_name}} account. Enter this code to choose a new password:\n\n# {{code}}\n\nThe code expires in {{minutes}} minutes. If you did not ask for this, ignore this e-mail; your password will not change.",
+                'body' => "Hello {{first_name}},\n\nWe received a request to reset the password for your {{site_name}} account. Press the button below to choose a new password, or enter this code on the reset page:\n\n# {{code}}\n\nThe code and the button work once and expire in {{minutes}} minutes. If you did not ask for this, ignore this e-mail; your password will not change.",
                 'placeholders' => $common + ['code' => 'Six-digit code', 'minutes' => 'Minutes until the code expires'],
-                'action' => null,
+                'action' => 'Choose a new password',
             ],
             'welcome' => [
                 'name' => 'Welcome',
@@ -139,9 +139,38 @@ final class EmailTemplates
 
         return [
             'subject' => Str::limit(strip_tags($subject), 200, ''),
-            'html' => (string) Str::markdown($markdown, ['html_input' => 'escape', 'allow_unsafe_links' => false]),
+            'html' => self::inlineStyles((string) Str::markdown($markdown, ['html_input' => 'escape', 'allow_unsafe_links' => false])),
             'text' => $markdown,
         ];
+    }
+
+    /**
+     * Inline styles on the Markdown output, so Outlook and webmail (which drop
+     * or rewrite <style> blocks) show the same design. A level-1 heading is the
+     * one-time-code panel.
+     */
+    public static function inlineStyles(string $html): string
+    {
+        $styles = [
+            'h1' => "margin: 22px 0; padding: 18px 12px; background-color: #eef0fb; border: 2px dashed #25267a; border-radius: 12px; text-align: center; font-family: 'SFMono-Regular', Consolas, 'Courier New', monospace; font-size: 36px; line-height: 44px; letter-spacing: 10px; font-weight: 800; color: #25267a;",
+            'h2' => 'margin: 24px 0 8px; font-size: 20px; line-height: 28px; font-weight: 800; color: #25267a;',
+            'h3' => 'margin: 20px 0 6px; font-size: 16px; line-height: 24px; font-weight: 700; color: #25267a;',
+            'p' => 'margin: 0 0 16px;',
+            'ul' => 'margin: 0 0 16px; padding-left: 22px;',
+            'ol' => 'margin: 0 0 16px; padding-left: 22px;',
+            'li' => 'margin: 0 0 6px;',
+            'blockquote' => 'margin: 0 0 16px; padding: 10px 16px; border-left: 4px solid #f59e0b; background-color: #fffbeb; color: #78350f;',
+            'strong' => 'color: #0f172a; font-weight: 700;',
+            'hr' => 'border: 0; border-top: 1px solid #e2e8f0; margin: 22px 0;',
+        ];
+
+        foreach ($styles as $tag => $style) {
+            $html = preg_replace('/<'.$tag.'(\s|>)/', '<'.$tag.' style="'.$style.'"$1', $html) ?? $html;
+        }
+
+        $html = preg_replace('/<h1 /', '<h1 class="code" ', $html, 1) ?? $html;
+
+        return preg_replace('/<a /', '<a style="color: #25267a; font-weight: 600; text-decoration: underline;" ', $html) ?? $html;
     }
 
     /** Sample values for previews in the workspace. */

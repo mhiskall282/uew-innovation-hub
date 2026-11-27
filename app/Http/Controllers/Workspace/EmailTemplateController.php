@@ -75,6 +75,8 @@ class EmailTemplateController extends Controller
     {
         abort_unless(EmailTemplates::exists($template), 404);
 
+        request()->attributes->set('email_preview', true); // hosted images in the browser preview
+
         $mail = new TemplatedMail(
             $template,
             EmailTemplates::sample($template),

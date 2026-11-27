@@ -46,8 +46,14 @@ final class UserService
     /**
      * @param  array<string, mixed>  $data
      */
-    public function update(User $user, array $data): User
+    public function update(User $user, array $data, ?User $actor = null): User
     {
+        // Nobody changes their own role: no self-escalation, and no accidental
+        // self-demotion that locks the Hub Director out of administration.
+        if ($actor?->is($user) && $data['role'] !== $user->role->value) {
+            throw ValidationException::withMessages(['role' => 'You cannot change your own role. Ask another Hub Director.']);
+        }
+
         if ($data['role'] !== Role::SuperAdmin->value) {
             $this->guardLastAdministrator($user, 'role', 'This is the only active Hub Director. Assign another Hub Director first.');
         }

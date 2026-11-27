@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -63,16 +64,57 @@ final class VerificationService
         $record->expires_at = now()->addMinutes(self::EXPIRY_MINUTES);
         $record->save();
 
-        $template = $purpose === VerificationCode::RESET_PASSWORD ? 'password_reset_code' : 'verification_code';
+        $reset = $purpose === VerificationCode::RESET_PASSWORD;
+
+        // A signed link to the same one-time record: the button in the e-mail.
+        // It expires with the code, works once, and only opens a confirmation
+        // page; nothing changes until the person presses a button there, so
+        // mail scanners that pre-open links cannot use it up.
+        $link = URL::temporarySignedRoute(
+            $reset ? 'password.link' : 'verification.link',
+            $record->expires_at,
+            ['user' => $user->id, 'record' => $record->id],
+        );
 
         // The code is only ever delivered by e-mail. It is never shown on screen,
         // stored in the session, or written to logs by the application.
-        Mail::to($user)->send(new TemplatedMail($template, [
+        Mail::to($user)->send(new TemplatedMail($reset ? 'password_reset_code' : 'verification_code', [
             'name' => $user->name,
             'first_name' => $user->firstName(),
             'code' => $code,
             'minutes' => self::EXPIRY_MINUTES,
-        ]));
+        ], $link));
+    }
+
+    /**
+     * Uses the signed link from a code e-mail. Consumes the code it belongs to,
+     * so the link and the code each work once, whichever is used first.
+     *
+     * @throws ValidationException when the code was used, replaced or expired
+     */
+    public function consumeLink(User $user, string $purpose, int $recordId): void
+    {
+        $used = DB::transaction(function () use ($user, $purpose, $recordId) {
+            $record = VerificationCode::query()
+                ->whereKey($recordId)
+                ->where('user_id', $user->id)
+                ->where('purpose', $purpose)
+                ->whereNull('consumed_at')
+                ->lockForUpdate()
+                ->first();
+
+            if (! $record || $record->expires_at->isPast()) {
+                return false;
+            }
+
+            $record->forceFill(['consumed_at' => now()])->save();
+
+            return true;
+        });
+
+        if (! $used) {
+            throw ValidationException::withMessages(['code' => 'This link has expired or has already been used. Ask for a new one.']);
+        }
     }
 
     /**

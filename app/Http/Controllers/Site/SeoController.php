@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
+use App\Models\Album;
 use App\Models\Page;
 use App\Models\Post;
 use App\Models\Program;
@@ -44,6 +45,7 @@ class SeoController extends Controller
                 [route('site.publications.index'), null, '0.7'],
                 [route('site.news.index'), null, '0.7'],
                 [route('site.partners.index'), null, '0.5'],
+                [route('site.gallery.index'), null, '0.6'],
                 [route('site.community.index'), null, '0.5'],
                 [route('site.contact'), null, '0.5'],
             ]);
@@ -54,6 +56,8 @@ class SeoController extends Controller
                 ->each(fn ($p) => $urls->push([route('site.projects.show', $p), $p->updated_at, '0.6']));
             Post::published()->latest('published_at')->take(1000)->get(['id', 'slug', 'updated_at'])
                 ->each(fn ($p) => $urls->push([route('site.news.show', $p), $p->updated_at, '0.6']));
+            Album::published()->whereNotNull('cover_photo_id')->latest('id')->take(500)->get(['id', 'slug', 'updated_at'])
+                ->each(fn ($a) => $urls->push([route('site.gallery.show', $a), $a->updated_at, '0.5']));
             Page::published()->get(['id', 'slug', 'updated_at'])
                 ->each(fn ($p) => $urls->push([route('site.page', $p->slug), $p->updated_at, '0.4']));
 

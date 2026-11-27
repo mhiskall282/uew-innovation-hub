@@ -66,7 +66,7 @@ class UserController extends Controller
     {
         Gate::authorize('update', $user);
 
-        $this->users->update($user, $request->validated());
+        $this->users->update($user, $request->validated(), $request->user());
 
         return redirect()->route('workspace.users.index')->with('status', "{$user->name}'s account was updated.");
     }

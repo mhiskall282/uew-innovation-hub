@@ -1,14 +1,10 @@
-<x-emails.layout :subject="$rendered['subject']">
-    <div class="prose">{!! $rendered['html'] !!}</div>
-
+<x-emails.layout :subject="$rendered['subject']" :preheader="$preheader" :eyebrow="$eyebrow" :mail="$message ?? null" :footer-note="$footerNote">
+    {!! $rendered['html'] !!}
     @if ($actionUrl)
-        <p style="text-align: center; margin: 28px 0 8px;">
-            <a href="{{ $actionUrl }}" class="button">{{ $actionLabel }}</a>
+        <x-emails.button :href="$actionUrl">{{ $actionLabel }}</x-emails.button>
+        <p style="margin: 14px 0 0; text-align: center; font-size: 12px; line-height: 18px; color: #64748b;">
+            Button not working? Copy this link into your browser:<br>
+            <a href="{{ $actionUrl }}" style="color: #3157d5; word-break: break-all;">{{ $actionUrl }}</a>
         </p>
-        <p class="muted" style="text-align: center; margin-top: 0;">Or paste this link into your browser:<br><span style="word-break: break-all;">{{ $actionUrl }}</span></p>
-    @endif
-
-    @if ($footerNote)
-        <p class="muted" style="margin-top: 28px; border-top: 1px solid #e2e8f0; padding-top: 16px;">{!! $footerNote !!}</p>
     @endif
 </x-emails.layout>

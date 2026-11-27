@@ -46,6 +46,16 @@ return [
             'report' => false,
         ],
 
+        // Event photos (processed JPEGs). Served by the app, which checks the album
+        // is published. Switch to s3 with GALLERY_DISK=s3 for durable storage.
+        'gallery' => [
+            'driver' => 'local',
+            'root' => storage_path('app/gallery'),
+            'serve' => false,
+            'throw' => false,
+            'report' => false,
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

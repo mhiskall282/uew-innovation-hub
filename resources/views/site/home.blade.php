@@ -167,6 +167,34 @@
         </div>
     </section>
 
+    {{-- Moments: event photos from the gallery --}}
+    @if ($moments->isNotEmpty())
+        <section class="bg-uew-ink py-16 text-white" aria-labelledby="moments-heading">
+            <div class="mx-auto max-w-7xl px-6">
+                <div class="flex flex-wrap items-end justify-between gap-4">
+                    <div>
+                        <p class="font-mono text-[11px] font-bold tracking-[0.2em] text-uew-gold-light uppercase">Gallery</p>
+                        <h2 id="moments-heading" class="mt-2 text-3xl font-extrabold tracking-tight">Moments from the Hub</h2>
+                        <p class="mt-2 max-w-2xl text-blue-100/80">Pitch days, bootcamps, workshops and community projects.</p>
+                    </div>
+                    <x-ui.button :href="route('site.gallery.index')" variant="light" icon-right="arrow-right">See all photos</x-ui.button>
+                </div>
+                <ul class="mt-8 grid grid-cols-2 gap-3 md:grid-cols-4">
+                    @foreach ($moments as $i => $photo)
+                        @php [$w, $h] = $photo->dimensions($i === 0 ? 'large' : 'thumb'); @endphp
+                        <li @class(['md:col-span-2 md:row-span-2' => $i === 0])>
+                            <a href="{{ route('site.gallery.show', $photo->album->slug) }}" class="group relative block aspect-square overflow-hidden rounded-xl bg-uew-ink-soft">
+                                <img src="{{ $photo->url($i === 0 ? 'large' : 'thumb') }}" alt="{{ $photo->altText() }}" width="{{ $w }}" height="{{ $h }}" loading="lazy" decoding="async"
+                                     class="size-full object-cover transition duration-500 group-hover:scale-105">
+                                <span class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-uew-ink/90 to-transparent px-3 pt-8 pb-2.5 text-xs font-semibold opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100">{{ $photo->album->title }}</span>
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        </section>
+    @endif
+
     {{-- Partners --}}
     @if ($partners->isNotEmpty())
         <section class="border-y border-slate-200 bg-white py-14" aria-labelledby="partners-heading">

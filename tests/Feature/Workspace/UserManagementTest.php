@@ -88,8 +88,10 @@ class UserManagementTest extends TestCase
             ->assertSessionHasErrors('role');
         $this->assertSame(Role::SuperAdmin, $admin->fresh()->role);
 
-        $this->staff(Role::SuperAdmin);
-        $this->put("/workspace/users/{$admin->id}", ['name' => $admin->name, 'email' => $admin->email, 'role' => 'officer'])
+        // With a second Director, the change is allowed, but only made by the other
+        // Director: nobody can change their own role.
+        $second = $this->staff(Role::SuperAdmin);
+        $this->actingAs($second)->put("/workspace/users/{$admin->id}", ['name' => $admin->name, 'email' => $admin->email, 'role' => 'officer'])
             ->assertSessionHasNoErrors();
         $this->assertSame(Role::Officer, $admin->fresh()->role);
     }

@@ -23,6 +23,7 @@ fi
 # 3. Cache configuration, routes, views and events using the runtime environment.
 php artisan optimize
 
+mkdir -p storage/app/gallery storage/app/private
 chown -R www-data:www-data storage bootstrap/cache
 
 # 4. Database schema and first administrator.

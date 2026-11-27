@@ -31,10 +31,12 @@
         ],
         'Website' => [
             ['label' => 'News & posts', 'icon' => 'newspaper', 'route' => 'workspace.posts.index', 'match' => 'workspace.posts.*', 'can' => 'content.draft'],
+            ['label' => 'Gallery', 'icon' => 'photo', 'route' => 'workspace.albums.index', 'match' => 'workspace.albums.*', 'can' => 'content.draft'],
             ['label' => 'Pages', 'icon' => 'document', 'route' => 'workspace.pages.index', 'match' => 'workspace.pages.*', 'can' => 'pages.manage'],
         ],
         'Administration' => [
-            ['label' => 'Staff accounts', 'icon' => 'shield', 'route' => 'workspace.users.index', 'match' => 'workspace.users.*', 'can' => 'users.manage'],
+            ['label' => 'Staff accounts', 'icon' => 'users', 'route' => 'workspace.users.index', 'match' => 'workspace.users.*', 'can' => 'users.manage'],
+            ['label' => 'Roles & permissions', 'icon' => 'shield', 'route' => 'workspace.roles.index', 'match' => 'workspace.roles.*', 'can' => 'users.manage'],
             ['label' => 'Site settings', 'icon' => 'cog', 'route' => 'workspace.settings.edit', 'match' => 'workspace.settings.*', 'can' => 'settings.manage'],
             ['label' => 'E-mail templates', 'icon' => 'mail', 'route' => 'workspace.templates.index', 'match' => 'workspace.templates.*', 'can' => 'settings.manage'],
             ['label' => 'Audit log', 'icon' => 'clock', 'route' => 'workspace.audit.index', 'match' => 'workspace.audit.*', 'can' => 'audit.view'],

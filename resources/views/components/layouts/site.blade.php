@@ -12,6 +12,7 @@
         ['label' => 'Projects', 'route' => 'site.projects.index', 'match' => 'site.projects.*'],
         ['label' => 'Publications', 'route' => 'site.publications.index', 'match' => 'site.publications.*'],
         ['label' => 'News', 'route' => 'site.news.index', 'match' => 'site.news.*'],
+        ['label' => 'Gallery', 'route' => 'site.gallery.index', 'match' => 'site.gallery.*'],
         ['label' => 'Partners', 'route' => 'site.partners.index', 'match' => 'site.partners.*'],
         ['label' => 'Contact', 'route' => 'site.contact', 'match' => 'site.contact*'],
     ];
@@ -126,6 +127,7 @@
                     <li><a href="{{ route('site.publications.index') }}" class="hover:text-white">Publications</a></li>
                     <li><a href="{{ route('site.news.index') }}" class="hover:text-white">News</a></li>
                     <li><a href="{{ route('site.partners.index') }}" class="hover:text-white">Partners</a></li>
+                    <li><a href="{{ route('site.gallery.index') }}" class="hover:text-white">Gallery</a></li>
                     <li><a href="{{ route('site.community.index') }}" class="hover:text-white">Community &amp; leaderboard</a></li>
                 </ul>
             </div>

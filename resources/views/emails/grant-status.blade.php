@@ -1,13 +1,13 @@
-<x-emails.layout :subject="'Application update: ' . $application->reference_no">
-    <p style="margin-top: 0;">Dear {{ $application->applicant_name }},</p>
-    <p>There is an update on your application <strong>{{ $application->project_title }}</strong> ({{ $application->reference_no }}).</p>
-
-    <div class="card-box">
-        <p class="muted" style="margin: 0 0 6px 0;">Current status</p>
-        <p style="margin: 0;"><span class="badge badge-{{ $application->status->tone() }}">{{ $application->status->label() }}</span></p>
-        <p style="margin: 12px 0 0 0;">{{ $application->status->applicantMessage() }}</p>
-    </div>
-
-    <p style="text-align: center;"><a href="{{ route('site.programs.index') }}" class="button">See current programmes</a></p>
-    <p class="muted" style="margin-bottom: 0;">If you have questions about this decision, reply to {{ config('hub.contact_email') }} quoting your reference number.</p>
+<x-emails.layout :subject="'Application update: ' . $application->reference_no" eyebrow="Application update" :mail="$message ?? null"
+    :preheader="'Your application ' . $application->reference_no . ' is now: ' . $application->status->label()">
+    <p style="margin: 0 0 16px;">Dear {{ $application->applicant_name }},</p>
+    <p style="margin: 0 0 16px;">There is an update on your application <strong style="color: #0f172a;">{{ $application->project_title }}</strong>.</p>
+    <x-emails.panel tone="navy">
+        <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; color: #64748b;">Status</div>
+        <div style="margin-top: 2px; font-size: 18px; font-weight: 800; color: #102a72;">{{ $application->status->label() }}</div>
+        <div style="margin-top: 8px;">{{ $application->status->applicantMessage() }}</div>
+        <div style="margin-top: 10px; font-size: 12px; color: #64748b;">Reference: <span style="font-family: Consolas, 'Courier New', monospace; color: #0f172a;">{{ $application->reference_no }}</span></div>
+    </x-emails.panel>
+    <x-emails.button :href="route('site.programs.index')">See open programmes</x-emails.button>
+    <p style="margin: 18px 0 0; font-size: 13px; color: #64748b;">Questions about this decision? E-mail {{ config('hub.contact_email') }} and quote your reference.</p>
 </x-emails.layout>

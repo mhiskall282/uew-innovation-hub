@@ -113,3 +113,11 @@ Steps:
 - In production, demo data is only seeded when `SEED_PASSWORD` is strong (12+ characters, upper and lower case, a number). Otherwise the seeder skips the demo accounts.
 - On every boot, `php artisan hub:secure-demo-accounts` finds accounts that still use a well-known default password (`password`, `secret`...) and moves them to `SEED_PASSWORD`. It never prints passwords, and it records each change in the audit log. If `SEED_PASSWORD` is missing or weak, it changes nothing and logs a warning.
 - To change the tester password later, set a new `SEED_PASSWORD` and have each tester change their password under their account settings. The command only replaces default passwords, never passwords people chose.
+
+## Gallery photos
+
+Event photos are processed into JPEGs and stored on the `gallery` disk (`storage/app/gallery`). Render's free plan has no persistent disk, so photos uploaded there are lost on every redeploy. For real use, set `GALLERY_DISK=s3` with the same S3/R2 bucket settings used for documents. Photos in unpublished albums are only shown to staff; published photos are cached by browsers for a year.
+
+## E-mail images
+
+E-mails load the UEW crest from `MAIL_ASSET_URL` (defaults to `APP_URL`) over HTTPS. Images are never attached, because many work and school mail systems block attached images. When sending from a local machine, set `MAIL_ASSET_URL` to the live site.

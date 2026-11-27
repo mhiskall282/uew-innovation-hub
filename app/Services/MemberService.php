@@ -56,9 +56,20 @@ final class MemberService
     public function verifyEmail(User $user, string $code): void
     {
         $this->codes->verify($user, VerificationCode::VERIFY_EMAIL, $code);
+        $this->markVerified($user, 'code');
+    }
 
+    /** The "Verify my e-mail" button: a signed, single-use link to one code. */
+    public function verifyEmailByLink(User $user, int $recordId): void
+    {
+        $this->codes->consumeLink($user, VerificationCode::VERIFY_EMAIL, $recordId);
+        $this->markVerified($user, 'link');
+    }
+
+    private function markVerified(User $user, string $method): void
+    {
         $user->forceFill(['email_verified_at' => now()])->save();
-        $this->audit->record('member.verified', "{$user->email} verified their e-mail", $user, actor: $user);
+        $this->audit->record('member.verified', "{$user->email} verified their e-mail ({$method})", $user, actor: $user);
 
         if ($user->isMember()) {
             try {

@@ -50,6 +50,9 @@ return [
     | Allow search engines to index the public site. Off by default so test and
     | staging sites are never indexed; set SEARCH_INDEXING=true for the launch.
     */
+    /* Disk for gallery photos: 'gallery' (container disk) or 's3'. */
+    'gallery_disk' => env('GALLERY_DISK', 'gallery'),
+
     'search_indexing' => (bool) env('SEARCH_INDEXING', false),
 
     /* Allow `db:seed` to create demo data when APP_ENV=production (demo sites only). */
