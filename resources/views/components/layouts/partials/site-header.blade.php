@@ -8,8 +8,9 @@
     <div class="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:h-[72px]">
         {{-- Brand --}}
         <a href="{{ route('site.home') }}" class="flex shrink-0 items-center gap-3" aria-label="UEW Innovation Hub home">
-            <img src="{{ asset('images/uew/uew-logo.png') }}" alt="" width="44" height="43" class="hidden size-10 sm:block lg:size-11">
-            <span class="hidden h-9 w-px bg-slate-200 sm:block" aria-hidden="true"></span>
+            {{-- UEW crest: hidden at lg (1024–1279px), where the full menu needs the room. --}}
+            <img src="{{ asset('images/uew/uew-logo.png') }}" alt="" width="44" height="43" class="hidden size-10 sm:block lg:hidden xl:block xl:size-11">
+            <span class="hidden h-9 w-px bg-slate-200 sm:block lg:hidden xl:block" aria-hidden="true"></span>
             <x-ui.crest class="size-10 lg:size-11" />
             <span class="leading-tight">
                 <span class="block text-[15px] font-extrabold tracking-tight text-uew-navy">UEW Innovation Hub</span>
