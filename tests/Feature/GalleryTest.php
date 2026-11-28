@@ -185,6 +185,19 @@ class GalleryTest extends TestCase
         $this->assertSame(0, Album::count());
     }
 
+    public function test_photos_whose_files_were_lost_are_hidden_not_broken(): void
+    {
+        $album = $this->album();
+        $kept = app(GalleryService::class)->addFromPath($album, $this->jpegPath(), caption: 'Still here');
+        $lost = app(GalleryService::class)->addFromPath($album, $this->jpegPath(), caption: 'Lost on redeploy');
+        Storage::disk('gallery')->delete([$lost->path_large, $lost->path_thumb]);
+
+        $this->get(route('site.gallery.show', $album))->assertOk()->assertSee('Still here')->assertDontSee('Lost on redeploy');
+        $this->get('/')->assertOk()->assertSee('/media/photos/'.$kept->id.'/', false)->assertDontSee('/media/photos/'.$lost->id.'/', false);
+
+        $this->actingAs($this->staff(Role::Officer))->get(route('workspace.albums.edit', $album))->assertOk()->assertSee('File missing');
+    }
+
     public function test_a_photo_cannot_be_deleted_through_another_album(): void
     {
         $this->signInAs(Role::Officer);

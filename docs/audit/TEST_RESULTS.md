@@ -1,5 +1,19 @@
 # Test results
 
+## Update: 2026-11-27 (release 1.4.0)
+
+| Check | Result |
+| --- | --- |
+| PHPUnit, SQLite (local) | **177 passed, 0 failed** (1,279 assertions) |
+| CI on `c41cf32` | all 7 jobs green: code style, build, SQLite tests, PostgreSQL tests, browser tests (Chromium, Firefox, WebKit, Android and iOS emulation), dependency audit, Docker build |
+| Playwright viewport suite (local, Edge) | 14/14 at 320, 375, 390, 768, 1024, 1440 and 1920px. It caught a 44px header overflow at 1024px after Gallery joined the menu; fixed. |
+| Permission matrix (`PrivilegesTest`) | 144 role-and-route pairs: every state-changing workspace route refuses each role without its permission, and guests are sent to sign in |
+| Gallery (`GalleryTest`, 10 tests) | re-encode and resize, EXIF/GPS removed, disguised PHP and PDF rejected, intern vs officer rights, draft photos hidden, cache headers, file cleanup, lost files hidden |
+| Live e-mail, Gmail SMTP, new UEW design with hosted crest | **15/15 sent to hello@johnokyere.xyz and 15/15 to mdza@uew.edu.gh**, 0 problems. Delivery and appearance in the inbox are for the recipients to confirm. |
+| Live site | admin sign-in and sign-out work; `/`, `/gallery` and `/sitemap.xml` return 200; `/workspace/roles` and `/workspace/albums` redirect guests to sign-in |
+
+---
+
 Date: 2026-11-26. Everything below was run, not estimated. "Not run" is stated where it applies.
 
 ## 1. PHPUnit (unit, feature, integration, security)

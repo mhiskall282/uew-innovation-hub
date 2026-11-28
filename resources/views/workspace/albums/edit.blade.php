@@ -49,7 +49,15 @@
                     @php [$w, $h] = $photo->dimensions('thumb'); @endphp
                     <li class="overflow-hidden rounded-xl border border-slate-200 bg-white">
                         <div class="relative aspect-[4/3] bg-slate-100">
-                            <img src="{{ $photo->url('thumb') }}" alt="{{ $photo->altText() }}" width="{{ $w }}" height="{{ $h }}" loading="lazy" class="size-full object-cover">
+                            @if ($photo->isAvailable())
+                                <img src="{{ $photo->url('thumb') }}" alt="{{ $photo->altText() }}" width="{{ $w }}" height="{{ $h }}" loading="lazy" class="size-full object-cover">
+                            @else
+                                {{-- File lost (e.g. a redeploy on a host without persistent storage). Hidden on the public site. --}}
+                                <div class="flex size-full flex-col items-center justify-center gap-1 p-3 text-center text-xs text-red-700">
+                                    <x-ui.icon name="warning" class="size-6" />
+                                    File missing. Delete and upload again.
+                                </div>
+                            @endif
                             @if ($album->cover_photo_id === $photo->id)
                                 <span class="absolute top-2 left-2 rounded-full bg-uew-gold px-2 py-0.5 text-[10px] font-bold text-uew-ink">Cover</span>
                             @endif

@@ -53,8 +53,11 @@ class HomeController extends Controller
                 ->orderBy('album_photos.sort_order')
                 ->select('album_photos.*')
                 ->with('album:id,slug,title,event_date')
+                ->take(24)
+                ->get()
+                ->filter(fn (AlbumPhoto $photo) => $photo->isAvailable())
                 ->take(8)
-                ->get(),
+                ->values(),
         ]);
     }
 }

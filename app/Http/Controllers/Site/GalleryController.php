@@ -18,20 +18,27 @@ class GalleryController extends Controller
 {
     public function index(): View
     {
-        return view('site.gallery.index', [
-            'albums' => Album::published()->whereNotNull('cover_photo_id')
-                ->with('cover')->withCount('photos')->latestEvents()->paginate(12),
-        ]);
+        $albums = Album::published()->whereNotNull('cover_photo_id')
+            ->with('cover')->withCount('photos')->latestEvents()->paginate(12);
+
+        // Skip albums whose files are gone (see AlbumPhoto::isAvailable()).
+        $albums->setCollection($albums->getCollection()->filter(fn (Album $a) => $a->cover?->isAvailable())->values());
+
+        return view('site.gallery.index', ['albums' => $albums]);
     }
 
     public function show(Album $album): View
     {
         abort_unless($album->is_published, 404);
 
+        $album->load('photos', 'program:id,title,slug,status');
+        $album->setRelation('photos', $album->photos->filter(fn (AlbumPhoto $p) => $p->isAvailable())->values());
+
         return view('site.gallery.show', [
-            'album' => $album->load('photos', 'program:id,title,slug,status'),
+            'album' => $album,
             'more' => Album::published()->whereKeyNot($album->id)->whereNotNull('cover_photo_id')
-                ->with('cover')->withCount('photos')->latestEvents()->take(3)->get(),
+                ->with('cover')->withCount('photos')->latestEvents()->take(6)->get()
+                ->filter(fn (Album $a) => $a->cover?->isAvailable())->take(3)->values(),
         ]);
     }
 

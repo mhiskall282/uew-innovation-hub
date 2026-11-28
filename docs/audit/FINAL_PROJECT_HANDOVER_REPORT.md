@@ -47,9 +47,17 @@ Each area is scored on what was demonstrated, not what the code suggests.
 
 **READY FOR USER ACCEPTANCE TESTING, once you complete the first item in section 4.** It is not ready for production approval until the remaining items in section 4 are done and UAT is signed off.
 
+## 3a. Since this report (release 1.4.0, 2026-11-27)
+
+- Least privilege: nobody can change their own role; Roles & permissions page; admin-sent reset and verification e-mails; a route-matrix test (144 pairs) proving server-side enforcement.
+- Event photo gallery with safe image processing; lost files on hosts without persistent storage are hidden, not shown broken.
+- E-mails in official UEW crest colours with a hosted crest image (the missing-image fix); signed one-click links; one-click unsubscribe.
+- 177 tests; CI green on all 7 jobs. See TEST_RESULTS.md.
+
 ## 4. What needs you
 
 1. **Set `SEED_PASSWORD` in Render** (Dashboard → uew-innovation-hub → Environment) to a strong value: 12+ characters with upper and lower case and a number. On the next deploy every demo account moves to it. Then set `BLOCK_DEFAULT_PASSWORDS=true`. Until then, anyone can sign in to the live Hub Director account with `password`.
 2. **Turn on e-mail on the live site.** Live e-mail is currently `log`, so new online sign-ups never receive their code. Sign in as the Hub Director → Site settings → E-mail: SMTP, `smtp.gmail.com`, port 587, STARTTLS, your Gmail address and app password, then **Send test e-mail**. The password is stored encrypted. When UEW gives you the official mailbox, change it in the same place.
 3. Decide whether to rewrite git history to remove the committed tester password (F-02). Either way, don't use that password anywhere.
-4. Before launch: a paid or Neon PostgreSQL database (Render's free one expires after 30 days), S3/R2 storage for uploads, `SEED_DEMO_DATA=false` with a fresh database, `SEARCH_INDEXING=true`, and legal review of the Privacy and Terms pages.
+4. Before uploading real event photos: set `GALLERY_DISK=s3` with an S3/R2 bucket. On Render's free disk, uploads are erased on every redeploy.
+5. Before launch: a paid or Neon PostgreSQL database (Render's free one expires after 30 days), S3/R2 storage for uploads, `SEED_DEMO_DATA=false` with a fresh database, `SEARCH_INDEXING=true`, and legal review of the Privacy and Terms pages.

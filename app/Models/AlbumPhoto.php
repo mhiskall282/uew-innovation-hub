@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * One processed photo: a 1600px "large" and a 640px "thumb" JPEG, re-encoded
@@ -52,6 +53,20 @@ class AlbumPhoto extends Model
 
         return [(int) round($this->width * $scale), (int) round($this->height * $scale)];
     }
+
+    /**
+     * Whether both renditions are still on disk. Hosts without a persistent
+     * disk (Render's free plan) lose uploads on redeploy while the database
+     * keeps the rows; public pages skip such photos instead of showing broken
+     * images. Memoised per request.
+     */
+    public function isAvailable(): bool
+    {
+        return $this->available ??= Storage::disk($this->disk)->exists($this->path_thumb)
+            && Storage::disk($this->disk)->exists($this->path_large);
+    }
+
+    private ?bool $available = null;
 
     public function altText(): string
     {
