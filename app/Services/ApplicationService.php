@@ -205,6 +205,7 @@ final class ApplicationService
     {
         $fields = collect($program->fields())->reject(fn ($f) => $f['type'] === 'file')->values();
         $filename = 'applications-'.$program->slug.'-'.now()->format('Y-m-d').'.csv';
+        $this->audit->record('application.exported', "Exported applications for \"{$program->title}\" as CSV", $program);
 
         return response()->streamDownload(function () use ($program, $fields) {
             $out = fopen('php://output', 'w');

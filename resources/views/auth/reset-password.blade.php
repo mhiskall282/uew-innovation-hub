@@ -5,7 +5,7 @@
     <form method="POST" action="{{ route('password.update') }}" class="mt-8 space-y-5" x-data="{ busy: false }" @submit="busy = true">
         @csrf
         @include('auth.partials.code-input')
-        <x-ui.input name="password" type="password" label="New password" required autocomplete="new-password" hint="12 or more characters with upper and lower case letters and a number." />
+        <x-ui.input name="password" type="password" label="New password" required autocomplete="new-password" :hint="app()->isProduction() ? '12 or more characters with upper and lower case letters and a number.' : 'At least 8 characters.'" />
         <x-ui.input name="password_confirmation" type="password" label="Confirm new password" required autocomplete="new-password" />
         <x-ui.button type="submit" class="w-full" size="lg" ::disabled="busy">Reset password</x-ui.button>
     </form>

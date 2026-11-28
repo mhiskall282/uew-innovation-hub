@@ -109,9 +109,24 @@ class Program extends Model
             return false;
         }
 
-        return $this->applications()
-            ->whereNotIn('status', [ApplicationStatus::Draft, ApplicationStatus::Withdrawn])
-            ->count() >= $this->capacity;
+        // Lists preload this with withActiveApplicationsCount() so there is no query per row.
+        $taken = array_key_exists('active_applications_count', $this->getAttributes())
+            ? (int) $this->getAttributes()['active_applications_count']
+            : $this->applications()->whereNotIn('status', self::inactiveStatuses())->count();
+
+        return $taken >= $this->capacity;
+    }
+
+    /** Adds active_applications_count (applications that take a place) in one subquery. */
+    public function scopeWithActiveApplicationsCount(Builder $query): Builder
+    {
+        return $query->withCount(['applications as active_applications_count' => fn ($q) => $q->whereNotIn('status', self::inactiveStatuses())]);
+    }
+
+    /** @return list<ApplicationStatus> statuses that do not take a place */
+    public static function inactiveStatuses(): array
+    {
+        return [ApplicationStatus::Draft, ApplicationStatus::Withdrawn];
     }
 
     public function isAcceptingApplications(): bool

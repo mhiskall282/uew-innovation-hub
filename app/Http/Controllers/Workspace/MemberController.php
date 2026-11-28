@@ -12,6 +12,7 @@ use App\Http\Requests\Portal\ProfileRequest;
 use App\Models\Program;
 use App\Models\User;
 use App\Services\ApplicationService;
+use App\Services\AuditLogger;
 use App\Services\UserService;
 use App\Support\Demographics;
 use Illuminate\Http\RedirectResponse;
@@ -67,6 +68,7 @@ class MemberController extends Controller
     public function export(Request $request): StreamedResponse
     {
         $query = $this->query($request)->orderBy('id');
+        app(AuditLogger::class)->record('member.exported', 'Exported the member list as CSV (contains personal data)', null, ['filters' => array_filter($request->only(['search', 'affiliation', 'interest', 'state']))]);
 
         return response()->streamDownload(function () use ($query) {
             $out = fopen('php://output', 'w');

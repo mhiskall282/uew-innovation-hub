@@ -12,7 +12,11 @@ use Illuminate\View\View;
 
 class AuditLogController extends Controller
 {
-    private const AREAS = ['auth', 'project', 'grant', 'post', 'publication', 'organization', 'user'];
+    /** Every action prefix passed to AuditLogger::record() (e.g. 'album.published'). */
+    private const AREAS = [
+        'achievement', 'album', 'application', 'auth', 'broadcast', 'grant', 'member', 'message', 'organization',
+        'page', 'post', 'program', 'project', 'publication', 'report', 'settings', 'template', 'user',
+    ];
 
     public function __invoke(Request $request): View
     {

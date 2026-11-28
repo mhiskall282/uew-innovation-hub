@@ -11,7 +11,7 @@
         <x-ui.card title="Delivery">
             <dl class="space-y-3 text-sm">
                 <div class="flex justify-between"><dt class="text-slate-500">Recipients</dt><dd class="font-mono font-semibold">{{ number_format($broadcast->recipients_count) }}</dd></div>
-                <div class="flex justify-between"><dt class="text-slate-500">Sent</dt><dd class="font-medium">{{ $broadcast->sent_at?->format('j M Y, H:i') ?? 'Sending…' }}</dd></div>
+                <div class="flex justify-between"><dt class="text-slate-500">Sent</dt><dd class="font-medium">{{ $broadcast->sent_at?->format('j M Y, H:i') ?? ($broadcast->status === \App\Enums\BroadcastStatus::Failed ? 'Failed. Check the queue (failed_jobs) and send a new broadcast.' : 'Sending…') }}</dd></div>
                 <div class="flex justify-between"><dt class="text-slate-500">By</dt><dd class="font-medium">{{ $broadcast->author?->name ?? 'System' }}</dd></div>
                 @if ($broadcast->program)<div class="flex justify-between gap-3"><dt class="text-slate-500">Programme</dt><dd class="text-right font-medium">{{ $broadcast->program->title }}</dd></div>@endif
             </dl>

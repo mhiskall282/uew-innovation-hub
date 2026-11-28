@@ -9,6 +9,8 @@ enum BroadcastStatus: string
     case Draft = 'draft';
     case Sending = 'sending';
     case Sent = 'sent';
+    /** The fan-out job failed; see failed_jobs. Recipients queued before the failure still get the e-mail. */
+    case Failed = 'failed';
 
     public function label(): string
     {
@@ -21,6 +23,7 @@ enum BroadcastStatus: string
             self::Draft => 'slate',
             self::Sending => 'gold',
             self::Sent => 'green',
+            self::Failed => 'red',
         };
     }
 }

@@ -24,6 +24,8 @@ final class ReportExportService
      */
     public function projectsCsv(array $filters): StreamedResponse
     {
+        app(AuditLogger::class)->record('report.projects_exported', 'Exported the project portfolio as CSV', null, ['filters' => array_filter($filters)]);
+
         $query = Project::query()
             ->with('organizations:id,name')
             ->filter($filters)

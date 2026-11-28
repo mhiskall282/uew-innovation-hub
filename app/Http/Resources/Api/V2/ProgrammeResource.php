@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Resources\Api\V2;
 
-use App\Enums\ProgramStatus;
 use App\Models\Program;
 use Illuminate\Http\Request;
 
@@ -26,8 +25,6 @@ class ProgrammeResource extends Resource
             default => 'open',
         };
 
-        $full = $this->capacity > 0 && (int) ($this->active_applications_count ?? 0) >= $this->capacity;
-
         return [
             'id' => $this->slug,
             'title' => $this->title,
@@ -38,7 +35,7 @@ class ProgrammeResource extends Resource
             'description' => $this->when(self::isDetail('programmes'), fn () => $this->description),
             'eligibility' => $this->when(self::isDetail('programmes'), fn () => $this->eligibility),
             'availability' => $availability,
-            'is_accepting_applications' => $this->status === ProgramStatus::Published && $availability === 'open' && ! $full,
+            'is_accepting_applications' => $this->isAcceptingApplications(),
             'is_featured' => (bool) $this->is_featured,
             'funding' => self::money($this->funding_amount),
             'location' => $this->location,

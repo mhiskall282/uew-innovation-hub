@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V2;
 
-use App\Enums\ApplicationStatus;
 use App\Enums\ProgramType;
 use App\Http\Resources\Api\V2\ProgrammeResource;
 use App\Models\Program;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -32,7 +30,7 @@ class ProgrammeController extends ApiController
             default => Program::visible(),
         };
 
-        $query = $this->withActiveApplications($query)
+        $query = $query->withActiveApplicationsCount()
             ->when($filters['type'] ?? null, fn ($q, $type) => $q->where('type', $type))
             ->when($filters['focus_area'] ?? null, fn ($q, $area) => $q->where('focus_area', $area))
             ->search($filters['search'] ?? null, ['title', 'summary']);
@@ -44,20 +42,8 @@ class ProgrammeController extends ApiController
     {
         abort_unless($program->isVisible(), 404);
 
-        $program->loadCount(['applications as active_applications_count' => fn ($q) => $q->whereNotIn('status', self::inactive())]);
+        $program->loadCount(['applications as active_applications_count' => fn ($q) => $q->whereNotIn('status', Program::inactiveStatuses())]);
 
         return $this->respond(new ProgrammeResource($program));
-    }
-
-    /** One subquery for the whole page instead of a COUNT per programme. */
-    private function withActiveApplications(Builder $query): Builder
-    {
-        return $query->withCount(['applications as active_applications_count' => fn ($q) => $q->whereNotIn('status', self::inactive())]);
-    }
-
-    /** @return list<string> statuses that do not take a place (matches Program::isFull()). */
-    private static function inactive(): array
-    {
-        return [ApplicationStatus::Draft->value, ApplicationStatus::Withdrawn->value];
     }
 }

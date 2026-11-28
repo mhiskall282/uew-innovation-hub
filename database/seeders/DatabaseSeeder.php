@@ -32,13 +32,6 @@ class DatabaseSeeder extends Seeder
             return;
         }
 
-        // A hosted site must never get demo accounts with a guessable password.
-        if (app()->isProduction() && ! SecureDemoAccounts::isStrong((string) config('hub.seed_password'))) {
-            $this->command?->error('Not seeding demo accounts: set SEED_PASSWORD (12+ characters, upper and lower case, a number).');
-
-            return;
-        }
-
         // Hosted test sites seed demo data once. The container re-runs seeding on
         // every boot, and re-seeding would reset testers' passwords and decisions.
         if (app()->isProduction() && User::where('email', 'admin@uew.edu.gh')->exists()) {

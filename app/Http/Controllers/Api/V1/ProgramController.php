@@ -32,6 +32,7 @@ class ProgramController extends ApiController
         };
 
         $programs = $query
+            ->withActiveApplicationsCount()
             ->when($filters['type'] ?? null, fn ($q, $type) => $q->where('type', $type))
             ->when($filters['focus_area'] ?? null, fn ($q, $area) => $q->where('focus_area', $area))
             ->search($filters['search'] ?? null, ['title', 'summary'])

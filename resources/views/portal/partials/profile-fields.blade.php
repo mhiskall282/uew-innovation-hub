@@ -52,7 +52,7 @@
 <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card sm:p-6">
     <h2 class="text-base font-bold text-uew-navy">Communication</h2>
     <div class="mt-4">
-        <x-ui.checkbox name="marketing_opt_in" :checked="old('marketing_opt_in', $user->marketing_opt_in || ! $user->onboarded_at)"
+        <x-ui.checkbox name="marketing_opt_in" :checked="old('marketing_opt_in', $user->marketing_opt_in)"
             label="E-mail me when new programmes and events that match my interests are launched"
             hint="Occasional announcements only. Unsubscribe from any e-mail. Messages about your own applications are always sent." />
     </div>

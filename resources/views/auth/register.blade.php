@@ -61,7 +61,7 @@
                         <span class="h-1 rounded-full" :class="/\d/.test(pw) ? 'bg-emerald-500' : 'bg-slate-200'"></span>
                         <span class="h-1 rounded-full" :class="pw.length >= 12 ? 'bg-emerald-500' : 'bg-slate-200'"></span>
                     </div>
-                    <p class="mt-1.5 text-xs text-slate-500">Use 12 or more characters with upper and lower case letters and a number.</p>
+                    <p class="mt-1.5 text-xs text-slate-500">{{ app()->isProduction() ? 'Use 12 or more characters with upper and lower case letters and a number.' : 'Use at least 8 characters.' }}</p>
                 </div>
             </fieldset>
 

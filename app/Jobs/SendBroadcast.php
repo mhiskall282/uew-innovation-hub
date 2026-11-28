@@ -8,6 +8,7 @@ use App\Enums\BroadcastStatus;
 use App\Mail\TemplatedMail;
 use App\Models\Broadcast;
 use App\Models\User;
+use App\Services\AuditLogger;
 use App\Services\BroadcastService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -16,6 +17,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
+use Throwable;
 
 /**
  * Fans a broadcast out into one queued e-mail per recipient, reading
@@ -30,6 +32,21 @@ class SendBroadcast implements ShouldQueue
     public int $timeout = 600;
 
     public function __construct(public int $broadcastId) {}
+
+    /**
+     * Called by the queue when handle() throws. Without this the broadcast would
+     * stay at "sending" forever. Recorded in the audit log so staff can see it.
+     */
+    public function failed(?Throwable $e): void
+    {
+        $broadcast = Broadcast::find($this->broadcastId);
+        if (! $broadcast || $broadcast->status !== BroadcastStatus::Sending) {
+            return;
+        }
+
+        $broadcast->forceFill(['status' => BroadcastStatus::Failed])->save();
+        app(AuditLogger::class)->record('broadcast.failed', "Broadcast \"{$broadcast->subject}\" failed to send", $broadcast, ['error' => $e ? mb_substr($e->getMessage(), 0, 300) : null]);
+    }
 
     public function handle(BroadcastService $broadcasts): void
     {
