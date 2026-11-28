@@ -88,8 +88,10 @@ class GalleryTest extends TestCase
         $this->signInAs(Role::Officer);
         $album = $this->album();
 
-        $php = UploadedFile::fake()->createWithContent('shell.jpg', '<?php system($_GET["c"]); ?>');
-        $this->post(route('workspace.albums.photos.store', $album), ['photos' => [$php]])->assertSessionHasErrors('photos.0');
+        // A text file renamed .jpg. Deliberately harmless content: a real web-shell
+        // string here is (correctly) quarantined by antivirus from the temp folder.
+        $fake = UploadedFile::fake()->createWithContent('not-a-photo.jpg', 'This text file only pretends to be a photo.');
+        $this->post(route('workspace.albums.photos.store', $album), ['photos' => [$fake]])->assertSessionHasErrors('photos.0');
 
         $pdf = UploadedFile::fake()->create('doc.pdf', 10, 'application/pdf');
         $this->post(route('workspace.albums.photos.store', $album), ['photos' => [$pdf]])->assertSessionHasErrors('photos.0');
