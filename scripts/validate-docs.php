@@ -70,6 +70,7 @@ foreach ($files as $file) {
             for ($i = 0; $i < 3 && preg_match($mojibake, $text); $i++) {
                 $text = preg_replace_callback('/[\x{00C0}-\x{00FF}\x{0152}\x{0153}\x{0160}\x{0161}\x{0178}\x{017D}\x{017E}\x{0192}\x{02C6}\x{02DC}\x{2013}\x{2014}\x{2018}-\x{201E}\x{2020}-\x{2022}\x{2026}\x{2030}\x{2039}\x{203A}\x{20AC}\x{2122}][\x{0080}-\x{00FF}\x{0152}\x{0153}\x{0160}\x{0161}\x{0178}\x{017D}\x{017E}\x{0192}\x{02C6}\x{02DC}\x{2013}\x{2014}\x{2018}-\x{201E}\x{2020}-\x{2022}\x{2026}\x{2030}\x{2039}\x{203A}\x{20AC}\x{2122}]{1,3}/u', function ($m) {
                     $bytes = @mb_convert_encoding($m[0], 'Windows-1252', 'UTF-8');
+
                     return ($bytes !== false && mb_check_encoding($bytes, 'UTF-8') && $bytes !== '') ? $bytes : $m[0];
                 }, $text);
             }
@@ -136,6 +137,7 @@ foreach ($files as $file) {
         $real = realpath($target);
         if ($real === false) {
             $problems[] = "$rel: broken link $link";
+
             continue;
         }
         if ($anchor !== null && $anchor !== '' && str_ends_with($real, '.md')) {
