@@ -9,7 +9,7 @@ It has three parts:
 | Public website | `/` | Anyone: programmes, projects, publications, news, partners and the community leaderboard |
 | Member portal | `/portal` | Members: apply, message the Hub, track decisions, submit progress and budget reports, earn badges |
 | Staff workspace | `/workspace` | Hub staff, by role: programmes, reviews, incubation board, members, broadcasts, content, reports, administration |
-| Open data API | `/api/v1` | Partners and developers: read-only JSON for public data |
+| Open data API | `/api/v2` (current), `/api/v1` (frozen) | Partners and app developers: read-only JSON for public data, cursor paging and incremental sync in v2 |
 
 Everyone signs in at `/sign-in` (`/login` redirects there). Staff land in the workspace, members in their portal.
 
@@ -101,7 +101,7 @@ Demo data is for local use only. The seeder refuses to run in production unless 
 php artisan test
 ```
 
-148 feature and unit tests, plus Playwright browser tests (`npm run test:e2e`: journeys on Chromium, Firefox, WebKit and mobile, axe accessibility checks, and layouts from 320 to 1920px), cover the public site, member sign-up with e-mail codes, onboarding, password reset, sign-in and lockout, the role-by-page access matrix, applications, notifications, messages, progress reports, badges and XP, the community page, profile pre-fill, content and user management, document access, the API and security headers. `RouteSmokeTest` requests every page as a guest and as every role and fails on any server error.
+197 feature and unit tests, plus Playwright browser tests (`npm run test:e2e`: journeys on Chromium, Firefox, WebKit and mobile, axe accessibility checks, and layouts from 320 to 1920px), cover the public site, member sign-up with e-mail codes, onboarding, password reset, sign-in and lockout, the role-by-page access matrix, applications, notifications, messages, progress reports, badges and XP, the community page, profile pre-fill, content and user management, document access, the API and security headers. `RouteSmokeTest` requests every page as a guest and as every role and fails on any server error.
 
 CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs Pint, the asset build, a Blade compile check, the tests on SQLite and PostgreSQL, `composer audit`, `npm audit` and a Docker build on every push. Render deploys `main` automatically.
 
@@ -114,8 +114,12 @@ Step-by-step instructions, costs and limits are in [docs/deployment.md](docs/dep
 
 ## Documentation
 
+The full documentation lives in the **[documentation portal](docs/README.md)**: user and administrator guides, architecture with diagrams, developer guide, API v1/v2 reference, database, security, deployment and operations, testing, troubleshooting, maintenance and product documentation, each with reading paths by role.
+
+Earlier summaries, kept for reference:
+
 - [Architecture](docs/architecture.md): structure, layers, data model, request flow, scaling
-- [API reference](docs/api.md): endpoints, parameters, response format
+- [API v1 summary](docs/api.md): superseded by the [API reference](docs/06-api-reference/api-overview.md), which covers v1 and v2
 - [Deployment](docs/deployment.md): local, Render, Vercel, storage, mail, upgrades
 - [Security](docs/security.md): access control, data protection, hardening checklist
 - [Member guide](docs/guides/member-guide.md): sign-up, applying, reports, badges, troubleshooting
@@ -129,7 +133,7 @@ Step-by-step instructions, costs and limits are in [docs/deployment.md](docs/dep
 app/
   Console/Commands/   hub:create-admin, hub:import-documents
   Enums/              Role, Permission, ProjectStatus, GrantStatus, PostType
-  Http/Controllers/   Site/ (public), Workspace/ (staff), Api/V1/ (open data), Auth/
+  Http/Controllers/   Site/ (public), Workspace/ (staff), Api/V1/ and Api/V2/ (open data), Auth/
   Http/Requests/      Validation for every form
   Http/Resources/     API representations (public fields only)
   Models/             Eloquent models and shared concerns

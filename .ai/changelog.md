@@ -4,6 +4,26 @@ All notable changes to the UEW Innovation Hub Enterprise platform will be docume
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.5.0] - 2026-11-30
+
+### Added
+- Open data API v2 at `/api/v2` (current): cursor pagination (`limit`, `cursor`), `updated_since` incremental sync, whitelisted `sort` and `include`, string ids, money objects, `{data, meta, links}` envelope, machine-readable error codes, `/reference` and `/albums`. Version index at `/api`; `API-Version` header; Deprecation/Sunset headers driven by `config/api.php`.
+- Weak ETags and 304 responses on both API versions; CORS exposes API headers to browser apps (`config/cors.php`).
+- `/up` health check also queries the database.
+- Complete documentation set: `docs/README.md` portal and 13 sections (159 pages, 51 Mermaid diagrams), coverage matrix, changelog and final report; `scripts/validate-docs.php` and `scripts/mermaid-check.mjs` checkers.
+- Failed state for broadcasts (`BroadcastStatus::Failed`), set by `SendBroadcast::failed()` and audited.
+
+### Changed
+- API v1 is frozen (no breaking changes); it honours `API_CACHE_SECONDS` and the shared, configurable `api` rate limit.
+- CSV exports (members, projects, applications) are written to the audit log; the audit filter covers all 18 areas.
+- Announcement e-mails are opt-in at onboarding (no pre-ticked box).
+- Container upload limits: 12 files, 110 MB per request (gallery batches of 10 x 10 MB).
+
+### Fixed
+- Programme lists ran one capacity query per programme (now one subquery).
+- Password hints on sign-up and reset now match the real rule outside production.
+- Duplicate seeder guard, misplaced config comment, missing `.env.example` keys, unpinned Node version.
+
 ## [1.4.0] - 2026-11-27
 
 ### Added

@@ -1,5 +1,7 @@
 # Security
 
+> **Note:** This is an earlier summary. The maintained, code-verified documentation is in the [documentation portal](README.md); see [08 Security](08-security/security-overview.md). Where the two disagree, the portal is correct.
+
 ## Access control
 
 - The public website has no link to the staff workspace. Workspace pages send `noindex, nofollow`.

@@ -1,5 +1,7 @@
 # Architecture
 
+> **Note:** This is an earlier summary. The maintained, code-verified documentation is in the [documentation portal](README.md); see [04 Architecture](04-architecture/system-architecture.md). Where the two disagree, the portal is correct.
+
 ## Overview
 
 One Laravel 12 application serves three surfaces with different audiences and trust levels:

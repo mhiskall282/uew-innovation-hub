@@ -29,7 +29,9 @@ Laravel 12 / PHP 8.4 / Blade / Tailwind v4 / Alpine.js. One `users` table with r
 
 ## 3. Verification
 
-- 122 PHPUnit tests (feature + unit) incl. `RouteSmokeTest` (every GET route × 8 actors, no 5xx) and `EngagementTest` (IDOR, open redirect, privacy).
+- 197 PHPUnit tests (feature + unit) incl. `RouteSmokeTest` (every GET route x 8 actors, no 5xx), `PrivilegesTest` (144 role/route pairs), `ApiV2Test` and `OperationalFixesTest`. Playwright suites in `tests/e2e`.
+- Documentation: `docs/README.md` portal; known issues in `docs/12-maintenance/technical-debt-register.md`; owner actions in `docs/12-maintenance/project-handover.md`.
+- API: v2 current, v1 frozen (`config/api.php`).
 - CI: `.github/workflows/ci.yml` (Pint, build, Blade lint, SQLite + PostgreSQL tests, audits, Docker build).
 - Live black-box check: security headers, cookies, CSRF, sensitive paths, auth redirects (see `docs/security.md`).
 

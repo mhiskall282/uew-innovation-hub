@@ -10,8 +10,11 @@ use App\Services\MailSettings;
 use App\Services\SettingsService;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Events\DiagnosingHealth;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
@@ -31,6 +34,10 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->registerPermissionGates();
         $this->registerRateLimiters();
+
+        // /up (health check) also proves the database answers, so a host such as Render
+        // marks the service unhealthy when the database is gone instead of serving errors.
+        Event::listen(DiagnosingHealth::class, fn () => DB::select('select 1'));
 
         // Outgoing mail can be configured from the workspace (Site settings > E-mail).
         if (! $this->app->runningUnitTests()) {

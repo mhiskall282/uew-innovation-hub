@@ -24,7 +24,7 @@ return [
     */
     'documents_disk' => env('DOCUMENTS_DISK', 'private'),
 
-    'api_docs_url' => env('API_DOCS_URL', 'https://github.com/mhiskall282/uew-innovation-hub/blob/main/docs/api.md'),
+    'api_docs_url' => env('API_DOCS_URL', 'https://github.com/mhiskall282/uew-innovation-hub/tree/main/docs/06-api-reference'),
 
     /* Maximum upload size for PDF documents, in kilobytes. */
     'max_upload_kb' => (int) env('MAX_UPLOAD_KB', 20480),

@@ -1,5 +1,7 @@
 # Open data API (v1)
 
+> **Note:** This is an earlier summary. The maintained, code-verified documentation is in the [documentation portal](README.md); see [06 API reference](06-api-reference/api-overview.md) (covers v1 and the current v2). Where the two disagree, the portal is correct.
+
 Read-only JSON access to the Hub's public data. No authentication is needed.
 
 - Base URL: `https://<your-domain>/api/v1`

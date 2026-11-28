@@ -246,6 +246,43 @@ class ApiV2Test extends TestCase
         }
     }
 
+    public function test_browser_apps_on_other_origins_can_read_api_headers(): void
+    {
+        $response = $this->getJson('/api/v2/stats', ['Origin' => 'https://partner.example.org'])->assertOk();
+
+        $response->assertHeader('Access-Control-Allow-Origin', '*');
+        $exposed = strtolower((string) $response->headers->get('Access-Control-Expose-Headers'));
+        foreach (['etag', 'api-version', 'x-ratelimit-remaining', 'sunset'] as $header) {
+            $this->assertStringContainsString($header, $exposed);
+        }
+
+        $this->options('/api/v2/projects', [], [
+            'Origin' => 'https://partner.example.org',
+            'Access-Control-Request-Method' => 'GET',
+        ])->assertNoContent()->assertHeader('Access-Control-Max-Age', '86400');
+    }
+
+    public function test_cache_lifetime_is_configurable_for_both_versions(): void
+    {
+        config(['api.cache_seconds' => 300]);
+
+        foreach (['/api/v1/stats', '/api/v2/stats'] as $url) {
+            $this->assertStringContainsString('max-age=300', (string) $this->getJson($url)->headers->get('Cache-Control'));
+        }
+    }
+
+    public function test_health_check_queries_the_database(): void
+    {
+        $queries = [];
+        DB::listen(function ($query) use (&$queries) {
+            $queries[] = $query->sql;
+        });
+
+        $this->get('/up')->assertOk();
+
+        $this->assertContains('select 1', $queries, '/up must prove the database answers');
+    }
+
     /** Writes a small JPEG to a temp file and returns its path. */
     private function jpeg(): string
     {

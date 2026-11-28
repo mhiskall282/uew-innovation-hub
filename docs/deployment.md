@@ -1,5 +1,7 @@
 # Deployment
 
+> **Note:** This is an earlier summary. The maintained, code-verified documentation is in the [documentation portal](README.md); see [09 Deployment and operations](09-deployment-and-operations/deployment-overview.md). Where the two disagree, the portal is correct.
+
 Three ways to run the UEW Innovation Hub, from cheapest to most capable. All use the same code.
 
 | Option | Cost | Good for | Limits |
