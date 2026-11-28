@@ -77,7 +77,8 @@ class AppServiceProvider extends ServiceProvider
             Limit::perDay($day)->by($request->ip()),
         ];
 
-        RateLimiter::for('api', fn (Request $request) => Limit::perMinute(60)->by($request->ip()));
+        // Shared by every API version (config/api.php, default 60 per minute per IP).
+        RateLimiter::for('api', fn (Request $request) => Limit::perMinute(max(1, (int) config('api.rate_limit_per_minute', 60)))->by($request->ip()));
         RateLimiter::for('contact-messages', $perIp(3, 20));
         RateLimiter::for('registrations', $perIp(5, 30));
         RateLimiter::for('password-codes', fn (Request $request) => [

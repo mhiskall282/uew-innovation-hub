@@ -69,9 +69,14 @@ abstract class ApiController extends Controller
 
     private function cached(JsonResponse $response): JsonResponse
     {
-        return $response
+        $response
             ->setPublic()
             ->setMaxAge(static::CACHE_SECONDS)
-            ->setSharedMaxAge(static::CACHE_SECONDS);
+            ->setSharedMaxAge(static::CACHE_SECONDS)
+            // Additive: a weak ETag lets clients revalidate and receive 304 Not Modified.
+            ->setEtag(md5((string) $response->getContent()), true);
+        $response->isNotModified(request());
+
+        return $response;
     }
 }

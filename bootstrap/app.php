@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\ApiVersion;
 use App\Http\Middleware\EnsureAccountIsActive;
 use App\Http\Middleware\EnsureEmailIsVerified;
 use App\Http\Middleware\EnsureOnboarded;
@@ -29,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'active' => EnsureAccountIsActive::class,
             'verified.email' => EnsureEmailIsVerified::class,
             'onboarded' => EnsureOnboarded::class,
+            'api.version' => ApiVersion::class,
         ]);
 
         $middleware->appendToGroup('web', SecurityHeaders::class);
@@ -72,12 +74,34 @@ return Application::configure(basePath: dirname(__DIR__))
                 default => [500, config('app.debug') ? $e->getMessage() : 'Server error.', null],
             };
 
+            $headers = $e instanceof HttpExceptionInterface ? $e->getHeaders() : [];
+
+            // v2 and later: { "error": { status, code, message, details } } with a stable,
+            // machine-readable code. v1 keeps its original { success, message, errors } shape.
+            if ($request->is('api/v2', 'api/v2/*')) {
+                $error = ['status' => $status, 'code' => match ($status) {
+                    400 => 'bad_request',
+                    401 => 'unauthenticated',
+                    403 => 'forbidden',
+                    404 => 'not_found',
+                    405 => 'method_not_allowed',
+                    422 => 'validation_failed',
+                    429 => 'rate_limited',
+                    500 => 'server_error',
+                    503 => 'service_unavailable',
+                    default => 'http_error',
+                }, 'message' => $message];
+                if ($errors) {
+                    $error['details'] = $errors;
+                }
+
+                return response()->json(['error' => $error], $status, $headers);
+            }
+
             $payload = ['success' => false, 'message' => $message];
             if ($errors) {
                 $payload['errors'] = $errors;
             }
-
-            $headers = $e instanceof HttpExceptionInterface ? $e->getHeaders() : [];
 
             return response()->json($payload, $status, $headers);
         });

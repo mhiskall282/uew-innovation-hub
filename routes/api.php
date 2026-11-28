@@ -1,35 +1,32 @@
 <?php
 
-use App\Http\Controllers\Api\V1;
+use App\Http\Controllers\Api\VersionsController;
 use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Public REST API, version 1
+| Open data API
 |--------------------------------------------------------------------------
-| Read-only access to public data: impact statistics, projects, publications,
-| news, partners, programmes and the opt-in community leaderboard.
-| Rate limited to 60 requests per minute per IP.
-| Documented in docs/api.md and docs/api/openapi.yaml.
+| Read-only access to public data. Each version lives in its own route file
+| and controller namespace, and keeps its URL and response shape for its
+| whole life (see config/api.php for status, deprecation and sunset dates).
+|
+|   /api       list of versions
+|   /api/v1    routes/api/v1.php  (App\Http\Controllers\Api\V1)
+|   /api/v2    routes/api/v2.php  (App\Http\Controllers\Api\V2)  current
+|
+| All versions share the `api` rate limiter (60 requests per minute per IP
+| by default). Documented in docs/06-api-reference/.
 */
 
-Route::prefix('v1')->middleware('throttle:api')->name('api.v1.')->group(function () {
-    Route::get('/', V1\IndexController::class)->name('index');
-    Route::get('/stats', V1\StatsController::class)->name('stats');
+Route::get('/', VersionsController::class)->middleware('throttle:api')->name('api.versions');
 
-    Route::get('/projects', [V1\ProjectController::class, 'index'])->name('projects.index');
-    Route::get('/projects/{project}', [V1\ProjectController::class, 'show'])->name('projects.show');
+Route::prefix('v1')
+    ->middleware(['api.version:v1', 'throttle:api'])
+    ->name('api.v1.')
+    ->group(base_path('routes/api/v1.php'));
 
-    Route::get('/publications', [V1\PublicationController::class, 'index'])->name('publications.index');
-    Route::get('/publications/{publication}', [V1\PublicationController::class, 'show'])->name('publications.show');
-
-    Route::get('/news', [V1\NewsController::class, 'index'])->name('news.index');
-    Route::get('/news/{post}', [V1\NewsController::class, 'show'])->name('news.show');
-
-    Route::get('/partners', [V1\PartnerController::class, 'index'])->name('partners.index');
-
-    Route::get('/programmes', [V1\ProgramController::class, 'index'])->name('programmes.index');
-    Route::get('/programmes/{program}', [V1\ProgramController::class, 'show'])->name('programmes.show');
-
-    Route::get('/community', V1\CommunityController::class)->name('community');
-});
+Route::prefix('v2')
+    ->middleware(['api.version:v2', 'throttle:api'])
+    ->name('api.v2.')
+    ->group(base_path('routes/api/v2.php'));
